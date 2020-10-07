@@ -12,4 +12,15 @@ Currently this project uses the beta branch of flutter: `Flutter 1.22.0 • chan
 
 ## Plan
 
-`\\ TODO add plan... :)` 
+`\\ TODO add plan... :)`
+
+## Design
+
+`\\ TODO add plan... :(`
+
+## Help
+
+Useful information when installing and developing with this project.
+
+- `flutter packages pub run build_runner watch` Will start the file watcher that regenerates the Moor auto-generated code.
+  
