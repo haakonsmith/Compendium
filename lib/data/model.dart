@@ -35,9 +35,6 @@ LazyDatabase _openConnection() {
 // tables we just defined. We'll see how to use that database class in a moment.
 @UseMoor(
   tables: [People],
-  // queries: {
-  //   '_people': 'SELECT * FROM people'
-  // }
 )
 class CompendiumDatabase extends _$CompendiumDatabase {
   // we tell the database where to store the data with this constructor
