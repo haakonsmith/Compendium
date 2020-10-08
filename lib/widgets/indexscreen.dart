@@ -2,7 +2,6 @@ import 'package:compendium/BLoC/people_bloc.dart';
 import 'package:compendium/data/model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer' as developer;
 
 class IndexScreen extends StatefulWidget {
   @override
@@ -18,11 +17,9 @@ class _IndexScreenState extends State<IndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    developer.log('log me', name: 'my.app.category');
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todo list'),
+        title: Text('People index'),
       ),
       body: StreamBuilder<List<Person>>(
         stream: bloc.homeScreenPeople,
@@ -42,26 +39,25 @@ class _IndexScreenState extends State<IndexScreen> {
               child: Text('Try adding a person'),
             );
           }
-          developer.log(people.length.toString(), name: 'my.app.category');
 
           return ListView.builder(
             itemCount: people.length,
             itemBuilder: (context, index) {
-              return Text(people[index].firstName);
+              return Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(people[index].firstName)));
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => getNewPerson(
-                      context: context, firstnameController: firstnameGetter)
-                  .then((val) {
-                developer.log(val.firstName + "adding",
-                    name: 'my.app.category');
-                bloc.addPerson(val);
-                developer.log(val.firstName + " adding 2",
-                    name: 'my.app.category');
-              })),
+        onPressed: () =>
+            getNewPerson(context: context, firstnameController: firstnameGetter)
+                .then((val) => bloc.addPerson(val)),
+        child: Icon(Icons.add),
+      ),
     );
   }
 
@@ -127,10 +123,7 @@ Future<PersonData> getNewPerson({
         );
       }).then((val) {});
 
-  developer.log(item.firstName, name: 'my.app.category');
-
   if (item == null) {
-    developer.log(item.firstName + "Error", name: 'my.app.category');
     return Future.error("Dialog closed before data could be retrived");
   } else {
     return Future.value(item);

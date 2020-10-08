@@ -12,11 +12,10 @@ class CompendiumApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider<PeopleBloc>(
       create: (_) => PeopleBloc(),
-      // dispose: (_, bloc) => bloc.close(),
       child: MaterialApp(
         title: 'moor Demo',
         theme: ThemeData(
-          primarySwatch: Colors.orange,
+          primarySwatch: Colors.blueGrey,
           typography: Typography.material2018(),
         ),
         home: IndexScreen(),
