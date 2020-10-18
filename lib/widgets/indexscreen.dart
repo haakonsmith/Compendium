@@ -1,9 +1,14 @@
 import 'package:compendium/BLoC/people_bloc.dart';
 import 'package:compendium/data/model.dart';
+import 'package:compendium/widgets/nav_drawer.dart';
+import 'package:compendium/widgets/person_view.dart';
+import 'package:compendium/widgets/popups/person_creation_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class IndexScreen extends StatefulWidget {
+  static final String routeName = '/index';
+
   @override
   _IndexScreenState createState() {
     return _IndexScreenState();
@@ -11,9 +16,11 @@ class IndexScreen extends StatefulWidget {
 }
 
 class _IndexScreenState extends State<IndexScreen> {
-  PeopleBloc get bloc => Provider.of<PeopleBloc>(context, listen: false);
+  PeopleBloc get bloc =>
+      PeopleBloc(Provider.of<CompendiumDatabase>(context, listen: false));
 
   var firstnameGetter = TextEditingController();
+  var surnameGetter = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,41 +28,74 @@ class _IndexScreenState extends State<IndexScreen> {
       appBar: AppBar(
         title: Text('People index'),
       ),
-      body: StreamBuilder<List<Person>>(
-        stream: bloc.homeScreenPeople,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Align(
-              alignment: Alignment.center,
-              child: Text('Loading...'),
+      drawer: NavDrawer(),
+      body: Column(children: [
+        Expanded(
+            child: StreamBuilder<List<Person>>(
+          stream: bloc.homeScreenPeople,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Align(
+                alignment: Alignment.center,
+                child: Text('Loading...'),
+              );
+            }
+
+            final people = snapshot.data;
+
+            if (people.length == 0) {
+              return const Align(
+                alignment: Alignment.center,
+                child: Text('Try adding a person'),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: people.length,
+              itemBuilder: (context, index) {
+                return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Material(
+                        color: Colors.red,
+                        child: InkWell(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PersonView())),
+                            child: Container(
+                                padding: EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: Offset(
+                                            0, 3), // changes position of shadow
+                                      ),
+                                    ]),
+                                child: Row(children: <Widget>[
+                                  Text(people[index].firstName),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    people[index].surName,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ])))));
+              },
             );
-          }
-
-          final people = snapshot.data;
-
-          if (people.length == 0) {
-            return const Align(
-              alignment: Alignment.center,
-              child: Text('Try adding a person'),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: people.length,
-            itemBuilder: (context, index) {
-              return Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(people[index].firstName)));
-            },
-          );
-        },
-      ),
+          },
+        ))
+      ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            getNewPerson(context: context, firstnameController: firstnameGetter)
-                .then((val) => bloc.addPerson(val)),
+        onPressed: () => getNewPerson(
+                context: context,
+                firstnameController: firstnameGetter,
+                surnameController: surnameGetter)
+            .then((val) => bloc.addPerson(val)),
         child: Icon(Icons.add),
       ),
     );
@@ -65,67 +105,5 @@ class _IndexScreenState extends State<IndexScreen> {
   void dispose() {
     firstnameGetter.dispose();
     super.dispose();
-  }
-}
-
-// Pass the controllers so they can be diposed outside in state manganger widget
-Future<PersonData> getNewPerson({
-  @required BuildContext context,
-  @required TextEditingController firstnameController,
-}) async {
-  TextEditingController firstnameGetter = firstnameController;
-
-  final _formKey = GlobalKey<FormState>();
-
-  PersonData item;
-
-  await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    decoration: InputDecoration(labelText: 'Enter firstname'),
-                    controller: firstnameGetter,
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: RaisedButton(
-                    child: Text("Submit"),
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        item = PersonData(firstName: firstnameGetter.text);
-                        _formKey.currentState.save();
-
-                        Navigator.of(context, rootNavigator: true)
-                            .pop('dialog');
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      }).then((val) {});
-
-  if (item == null) {
-    return Future.error("Dialog closed before data could be retrived");
-  } else {
-    return Future.value(item);
   }
 }
