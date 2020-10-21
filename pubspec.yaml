@@ -30,8 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  moor: # use the latest version
-  sqlite3_flutter_libs: # Also use the latest version.
+  hive: 
+  hive_flutter: 
   path_provider:
   path:
   provider: ^4.3.2+2
@@ -44,7 +44,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  moor_generator: # use the latest version
+  hive_generator: 
   build_runner: 
   
 

@@ -1,14 +1,16 @@
 # Compendium
 
-A Flutter project for personal data recording and custom functionality. This project was envisioned to be very modular with the ability for custom functionality.
+The Compendium wants to be your templated, structured journal, but also your journal for others. Where you can jot down everything from someone's (including your own) birthday, to a psychoanalytic profile, and the best part is, you don't have to use any of the functionality. 
+
+This project was built by programmers for programmers, so it's been designed to be extremely modular and customisable.
 
 ## Flutter version
 
-Currently this project uses the beta branch of flutter: `Flutter 1.22.0 • channel beta`. This is because I wanted to try the web version of Flutter. **This is subject to change**
+Currently this project uses the beta branch of flutter: `Flutter 1.22.0 • channel beta`. This is because ideally this project will have mobile, and desktop support. **This is subject to change**
 
 ## Packages
 
-- [Moor](https://moor.simonbinder.eu/docs/getting-started/) – Used for SQLlite backend
+- [Hive](https://docs.hivedb.dev/#/README) – Used for NOSQL backend
 
 ## Plan
 
@@ -20,7 +22,7 @@ Currently this project uses the beta branch of flutter: `Flutter 1.22.0 • chan
 
 ## Help
 
-Useful information when installing and developing with this project.
+### Useful information when installing and developing with this project.
 
-- `flutter packages pub run build_runner watch` Will start the file watcher that regenerates the Moor auto-generated code.
+- `flutter packages pub run build_runner build` Will build the generated hive code.
   
