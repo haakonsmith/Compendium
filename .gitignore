@@ -31,6 +31,13 @@
 .pub/
 /build/
 
+# Flutter-related
+**/Flutter/ephemeral/
+**/Pods/
+
+# Xcode-related
+**/xcuserdata/
+
 # Web related
 lib/generated_plugin_registrant.dart
 
