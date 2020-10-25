@@ -1,4 +1,5 @@
 import 'package:compendium/data/person.dart';
+import 'package:compendium/widgets/person_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -40,15 +41,22 @@ class _IndexScreenState extends State<IndexScreen> {
   }
 
   ListView _buildListView(context, peopleBox) {
-    return ListView.builder(
-        itemCount: peopleBox.length,
-        itemBuilder: (context, index) {
-          Person person = peopleBox.getAt(index);
-          return Card(
-              child: ListTile(
-            title: Text(person.firstName + " " + person.lastName),
-          ));
-        });
+    return ListView.separated(
+      itemCount: peopleBox.length,
+      itemBuilder: (context, index) {
+        Person person = peopleBox.getAt(index);
+        return ListTile(
+          title: Text(person.firstName + " " + person.lastName),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => PersonView(personID: index),
+          )),
+        );
+      },
+      separatorBuilder: (context, index) => Divider(
+          height: 20,
+          indent: MediaQuery.of(context).size.width * 0.05,
+          endIndent: MediaQuery.of(context).size.width * 0.05),
+    );
   }
 }
 
@@ -69,6 +77,9 @@ Future<Person> getNewPerson({
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: Text('Add person'),
           content: Form(
             key: _formKey,
             child: Column(
