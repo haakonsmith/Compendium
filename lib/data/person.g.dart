@@ -19,7 +19,7 @@ class PersonAdapter extends TypeAdapter<Person> {
     return Person(
       firstName: fields[0] as String,
       lastName: fields[1] as String,
-    )..datablocks = (fields[2] as List)?.cast<Datablocks>();
+    )..datablocks = (fields[2] as Map)?.cast<String, String>();
   }
 
   @override

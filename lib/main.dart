@@ -1,4 +1,4 @@
-import 'package:compendium/widgets/index_screen.dart';
+import 'package:compendium/screens/indexScreen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
@@ -12,7 +12,7 @@ void main() async {
   Hive.registerAdapter(PersonAdapter());
 
   await Hive.openBox('settings');
-  await Hive.openBox('people');
+  await Hive.openBox<Person>('people');
 
   runApp(CompendiumApp());
 }

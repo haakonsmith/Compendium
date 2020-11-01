@@ -11,10 +11,13 @@ class Person {
   @HiveField(1)
   String lastName;
 
-  @HiveField(2)
-  List<Datablocks> datablocks;
+  // @HiveField(2) // can we just use a map?
+  // List<Datablocks> datablocks;
+
+  @HiveField(2) // I mean, data blocks might be easier so we may switch to that in the future.
+  Map<String, String> datablocks;
 
   Person({@required this.firstName, @required this.lastName});
 }
 
-class Datablocks {}
+class Datablocks {} // do we need this?
