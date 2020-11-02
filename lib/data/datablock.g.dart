@@ -1,38 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'person.dart';
+part of 'datablock.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PersonAdapter extends TypeAdapter<Person> {
+class DatablockAdapter extends TypeAdapter<Datablock> {
   @override
-  final int typeId = 1;
+  final int typeId = 2;
 
   @override
-  Person read(BinaryReader reader) {
+  Datablock read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Person(
-      firstName: fields[0] as String,
-      lastName: fields[1] as String,
-      datablockID: fields[2] as String,
+    return Datablock(
+      name: fields[0] as String,
+      colour: fields[1] as Color,
+      attributes: (fields[2] as Map)?.cast<String, String>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, Person obj) {
+  void write(BinaryWriter writer, Datablock obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.firstName)
+      ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.lastName)
+      ..write(obj.colour)
       ..writeByte(2)
-      ..write(obj.datablockID);
+      ..write(obj.attributes);
   }
 
   @override
@@ -41,7 +41,7 @@ class PersonAdapter extends TypeAdapter<Person> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PersonAdapter &&
+      other is DatablockAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,3 +1,4 @@
+import 'package:compendium/data/datablock.dart';
 import 'package:compendium/data/person.dart';
 import 'package:compendium/widgets/attributes.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +17,17 @@ class PersonView extends StatefulWidget {
 
 class _PersonViewState extends State<PersonView> {
   Person person;
+  Box<Datablock> datablocks;
+  bool loading = true;
 
   @override
   Widget build(BuildContext context) {
     person ??= Hive.box<Person>('people').getAt(widget.personID);
+
+    if (loading) {
+      datablocks ??= Hive.openBox<Datablock>(person.datablockID);
+    }
+
     return Scaffold(
       // probably need to add a top selecting thing kinda like channel page in the Youtube app
       appBar: AppBar(
@@ -37,8 +45,10 @@ class _PersonViewState extends State<PersonView> {
     );
   }
 
+  Future<void> loading() async {}
+
   Widget _buildListView(BuildContext context) {
-    if (person.datablocks == null) {
+    if (datablocks.length == 0) {
       return Center(
         child: Text(
           'No data here :)\nTry adding some with the add button\nin the bottom right corner.',
