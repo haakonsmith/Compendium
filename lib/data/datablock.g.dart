@@ -18,9 +18,9 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
     };
     return Datablock(
       name: fields[0] as String,
-      colour: fields[1] as Color,
-      attributes: (fields[2] as Map)?.cast<String, String>(),
-    );
+    )
+      ..colourValue = fields[1] as int
+      ..attributes = (fields[2] as Map)?.cast<String, String>();
   }
 
   @override
@@ -30,7 +30,7 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.colour)
+      ..write(obj.colourValue)
       ..writeByte(2)
       ..write(obj.attributes);
   }

@@ -19,7 +19,7 @@ class PersonAdapter extends TypeAdapter<Person> {
     return Person(
       firstName: fields[0] as String,
       lastName: fields[1] as String,
-      datablockID: fields[2] as String,
+      databoxID: fields[2] as String,
     );
   }
 
@@ -32,7 +32,7 @@ class PersonAdapter extends TypeAdapter<Person> {
       ..writeByte(1)
       ..write(obj.lastName)
       ..writeByte(2)
-      ..write(obj.datablockID);
+      ..write(obj.databoxID);
   }
 
   @override

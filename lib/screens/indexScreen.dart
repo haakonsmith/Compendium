@@ -3,6 +3,7 @@ import 'package:compendium/screens/personScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class IndexScreen extends StatefulWidget {
   @override
@@ -10,10 +11,12 @@ class IndexScreen extends StatefulWidget {
 }
 
 class _IndexScreenState extends State<IndexScreen> {
-  var box = Hive.box<Person>('people');
+  Box<Person> box;
 
   @override
   Widget build(BuildContext context) {
+    box = Provider.of<Box<Person>>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('People'),
@@ -29,7 +32,10 @@ class _IndexScreenState extends State<IndexScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => getNewPerson(
           context: context,
-        ).then((val) => box.add(val)),
+        ).then((val) {
+          val.databoxID = box.length.toString();
+          box.add(val);
+        }),
         child: Icon(Icons.add),
       ),
     );
@@ -44,14 +50,16 @@ class _IndexScreenState extends State<IndexScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(person.firstName + " " + person.lastName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              Text(person.firstName + " " + person.lastName,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
                       title: Text('Are you sure?'),
                       content: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -64,7 +72,8 @@ class _IndexScreenState extends State<IndexScreen> {
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
                               box.deleteAt(index);
-                              Navigator.of(context, rootNavigator: true).pop('dialog');
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop('dialog');
                             },
                           ),
                           RaisedButton(
@@ -74,7 +83,8 @@ class _IndexScreenState extends State<IndexScreen> {
                             ),
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
-                              Navigator.of(context, rootNavigator: true).pop('dialog');
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop('dialog');
                             },
                           ),
                         ],
@@ -87,12 +97,15 @@ class _IndexScreenState extends State<IndexScreen> {
           ),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => PersonView(personID: index),
+              builder: (context) => PersonView(personIndex: index),
             ),
           ),
         );
       },
-      separatorBuilder: (context, index) => Divider(height: 20, indent: MediaQuery.of(context).size.width * 0.05, endIndent: MediaQuery.of(context).size.width * 0.05),
+      separatorBuilder: (context, index) => Divider(
+          height: 20,
+          indent: MediaQuery.of(context).size.width * 0.05,
+          endIndent: MediaQuery.of(context).size.width * 0.05),
     );
   }
 }
@@ -112,7 +125,8 @@ Future<Person> getNewPerson({
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           title: Text('Add person'),
           content: Form(
             key: _formKey,
@@ -160,20 +174,29 @@ Future<Person> getNewPerson({
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
-                            item = Person(firstName: firstnameController.text, lastName: lastnameController.text);
+                            item = Person(
+                              firstName: firstnameController.text,
+                              lastName: lastnameController.text,
+                              databoxID: "",
+                            );
 
-                            item.firstName = "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
-                            item.lastName = "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
+                            item.firstName =
+                                "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
+                            item.lastName =
+                                "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
 
                             _formKey.currentState.save(); // what does this do?
 
-                            Navigator.of(context, rootNavigator: true).pop('dialog');
+                            Navigator.of(context, rootNavigator: true)
+                                .pop('dialog');
                           }
                         },
                       ),
                       RaisedButton(
                         color: Theme.of(context).primaryColor,
-                        onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                        onPressed: () =>
+                            Navigator.of(context, rootNavigator: true)
+                                .pop('dialog'),
                         child: Text(
                           "Discard",
                           style: TextStyle(color: Colors.white),

@@ -12,11 +12,11 @@ class Person {
   String lastName;
 
   @HiveField(2)
-  String datablockID;
+  String databoxID;
 
   Person({
     @required this.firstName,
     @required this.lastName,
-    @required this.datablockID,
+    @required this.databoxID,
   });
 }
