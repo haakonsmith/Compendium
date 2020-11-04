@@ -1,7 +1,9 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/data/person.dart';
+import 'package:compendium/vendor/color_picker.dart';
 import 'package:compendium/widgets/attributes.dart';
+import 'package:compendium/widgets/color_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
@@ -20,24 +22,27 @@ class PersonView extends StatefulWidget {
 class _PersonViewState extends State<PersonView> {
   Box<Datablock> datablocksBox;
   bool loading = true;
-  PersonBloc personInterface;
+  PersonBloc personBloc;
   Person person;
 
-  Future<void> loadData() async {
-    personInterface = Provider.of<PersonBloc>(context);
-    await personInterface.setActivePerson(person);
+  Future<void> _loadData() async {
+    await personBloc.setActivePerson(person);
 
     setState(() => loading = false);
   }
 
+  _PersonViewState() {}
+
   @override
   Widget build(BuildContext context) {
-    person = Provider.of<Box<Person>>(context).getAt(widget.personIndex);
+    personBloc = Provider.of<PersonBloc>(context);
 
     if (loading) {
-      loadData();
-    }
+      personBloc.setActivePersonFromIndex(widget.personIndex);
+      person = personBloc.getActivePerson;
 
+      _loadData();
+    }
     return Scaffold(
       // probably need to add a top selecting thing kinda like channel page in the Youtube app
       appBar: AppBar(
@@ -50,7 +55,7 @@ class _PersonViewState extends State<PersonView> {
                     Theme.of(context).primaryColor),
               )
             : ValueListenableBuilder(
-                valueListenable: personInterface.listenForDatablocks(),
+                valueListenable: personBloc.listenForDatablocks(),
                 builder: (context, box, widget) {
                   return _buildListView(context, box);
                 }),
@@ -61,7 +66,7 @@ class _PersonViewState extends State<PersonView> {
         // so I'm just doing this to avoid copy-pasting the dialog code here too
         onPressed: () => getNewDatablock(
           context: context,
-        ).then((val) => personInterface.addDatablockToActivePerson(val)),
+        ).then((val) => personBloc.addDatablockToActivePerson(val)),
       ),
     );
   }
@@ -79,21 +84,20 @@ class _PersonViewState extends State<PersonView> {
     return ListView.builder(
       itemCount: datablockBox.length,
       itemBuilder: (context, index) {
-        return datablockBox.getAt(index).build(context);
+        return datablockBox.getAt(index).buildPreview(context);
       },
     );
   }
 
-// Pass the controllers so they can be disposed outside in state manager widget
   Future<Datablock> getNewDatablock({
     @required BuildContext context,
   }) async {
     TextEditingController nameController = TextEditingController();
-    TextEditingController colourController = TextEditingController();
 
     final _formKey = GlobalKey<FormState>();
 
     Datablock item;
+    var colourController = Colors.black;
 
     await showDialog(
         context: context,
@@ -123,19 +127,14 @@ class _PersonViewState extends State<PersonView> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      decoration: InputDecoration(labelText: 'Enter colour'),
-                      controller: colourController,
-                      // The validator receives the text that the user has entered.
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                      padding: EdgeInsets.all(8.0),
+                      child: ColorFormField(
+                        onChanged: (color) => (colourController = color),
+                        // Black by default, there's probably a better way to do this
+                        intialColor: colourController == null
+                            ? Colors.black
+                            : colourController,
+                      )),
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Row(
@@ -148,12 +147,11 @@ class _PersonViewState extends State<PersonView> {
                           ),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
+                            print(colourController);
                             if (_formKey.currentState.validate()) {
                               item = Datablock(
-                                name: nameController.text,
-                                // TODO implement proper colour picker
-                                colourValue: Colors.black.value,
-                              );
+                                  name: nameController.text,
+                                  colourValue: colourController.value);
 
                               _formKey.currentState
                                   .save(); // what does this do?

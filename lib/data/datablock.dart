@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:compendium/data/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
@@ -22,23 +25,43 @@ class Datablock {
     @required this.colourValue,
   });
 
-  Widget build(BuildContext context) {
+  Widget buildPreview(BuildContext context) {
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
     return Card(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-        child: Padding(
-            padding: EdgeInsets.all(0.0),
-            child: Column(children: [
-              SizedBox(
-                  width: double.infinity,
-                  height: 20.0,
-                  child: DecoratedBox(
-                      decoration: BoxDecoration(
-                    // borderRadius: BorderRadius.circular(20.0),
-                    color: Colors.indigoAccent,
-                  ))),
-              Text(name),
-            ])));
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      shadowColor: CompendiumColors.primaryBlueBlack,
+      elevation: 15,
+      child: ClipPath(
+          clipper: ShapeBorderClipper(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15))),
+          child: InkWell(
+            onTap: () {
+              print("test");
+            },
+            child: Container(
+                // height: 180,
+                decoration: BoxDecoration(
+                  border: Border(
+                      left: BorderSide(color: Color(colourValue), width: 15)),
+                  // color: Colors.white,
+                ),
+                padding: EdgeInsets.all(20.0),
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  child: Column(
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),
+                      )
+                    ],
+                  ),
+                )),
+          )),
+    );
   }
 }

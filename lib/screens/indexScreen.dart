@@ -110,7 +110,6 @@ class _IndexScreenState extends State<IndexScreen> {
   }
 }
 
-// Pass the controllers so they can be disposed outside in state manager widget
 Future<Person> getNewPerson({
   @required BuildContext context,
 }) async {
@@ -185,7 +184,8 @@ Future<Person> getNewPerson({
                             item.lastName =
                                 "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
 
-                            _formKey.currentState.save(); // what does this do?
+                            // Keep form state incase user wants to go back to form
+                            _formKey.currentState.save();
 
                             Navigator.of(context, rootNavigator: true)
                                 .pop('dialog');
