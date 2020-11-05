@@ -34,34 +34,39 @@ class Datablock {
       shadowColor: CompendiumColors.primaryBlueBlack,
       elevation: 15,
       child: ClipPath(
-          clipper: ShapeBorderClipper(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15))),
-          child: InkWell(
-            onTap: () {
-              print("test");
-            },
+        clipper: ShapeBorderClipper(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child: InkWell(
+          onTap: () {
+            print("test");
+          },
+          child: Container(
+            // height: 180,
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: Color(colourValue), width: 15)),
+              // color: Colors.white,
+            ),
+            padding: EdgeInsets.all(20.0),
+            alignment: Alignment.centerLeft,
             child: Container(
-                // height: 180,
-                decoration: BoxDecoration(
-                  border: Border(
-                      left: BorderSide(color: Color(colourValue), width: 15)),
-                  // color: Colors.white,
-                ),
-                padding: EdgeInsets.all(20.0),
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20.0),
-                      )
-                    ],
-                  ),
-                )),
-          )),
+              child: Column(
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

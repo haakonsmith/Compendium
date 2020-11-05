@@ -10,7 +10,7 @@ class PersonBloc {
   // This is the active person, basically the person that will be shown on the person screen
   Person activePerson;
 
-  PersonBloc() {}
+  PersonBloc();
 
   // Create the box or open it
   Future<void> setActivePerson(Person person) async {
