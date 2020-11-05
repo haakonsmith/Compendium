@@ -18,9 +18,8 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
     };
     return Datablock(
       name: fields[0] as String,
-    )
-      ..colourValue = fields[1] as int
-      ..attributes = (fields[2] as Map)?.cast<String, String>();
+      colourValue: fields[1] as int,
+    )..attributes = (fields[2] as Map)?.cast<String, String>();
   }
 
   @override

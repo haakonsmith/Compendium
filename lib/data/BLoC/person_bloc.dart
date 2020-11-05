@@ -6,29 +6,29 @@ import '../person.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class PersonBloc {
+class PersonBloc extends ChangeNotifier {
   // This is the active person, basically the person that will be shown on the person screen
-  Person activePerson;
+  Person _activePerson;
 
-  PersonBloc();
+  Box<Datablock> _activePersonBox;
 
   // Create the box or open it
   Future<void> setActivePerson(Person person) async {
-    activePerson = person;
-    await Hive.openBox<Datablock>(activePerson.databoxID);
+    _activePerson = person;
+    _activePersonBox = await Hive.openBox<Datablock>(_activePerson.databoxID);
   }
 
   Future<void> setActivePersonFromIndex(int personIndex) async {
     setActivePerson(Hive.box<Person>("people").getAt(personIndex));
   }
 
-  Person get getActivePerson => activePerson;
+  Person get activePerson => _activePerson;
 
   ValueListenable<Box<Datablock>> listenForDatablocks() {
-    return Hive.box<Datablock>(activePerson.databoxID).listenable();
+    return Hive.box<Datablock>(_activePerson.databoxID).listenable();
   }
 
   void addDatablockToActivePerson(Datablock datablock) {
-    Hive.box<Datablock>(activePerson.databoxID).add(datablock);
+    Hive.box<Datablock>(_activePerson.databoxID).add(datablock);
   }
 }

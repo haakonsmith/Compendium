@@ -16,14 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
-targets:
-  $default:
-    builders:
-      moor_generator:
-        options:
-          sqlite_modules:
-            - json1
-            - moor_ffi
+
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
@@ -33,7 +26,6 @@ dependencies:
   hive: 
   hive_flutter: 
   path_provider:
-  path:
   provider: ^4.3.2+2
 
   # The following adds the Cupertino Icons font to your application.
