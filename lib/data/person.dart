@@ -19,4 +19,8 @@ class Person {
     @required this.lastName,
     @required this.databoxID,
   });
+
+  static Person blank() {
+    return Person(firstName: "", lastName: "", databoxID: "");
+  }
 }

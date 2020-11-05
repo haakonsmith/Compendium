@@ -22,16 +22,15 @@ void main() async {
 
   // await Hive.openBox<Map<String, String>>('settings');
 
+  // print(await Hive.boxExists('people'));
+  // await Hive.deleteFromDisk();
+  // print(await Hive.boxExists('people'));
+  // await Hive.deleteBoxFromDisk('people');
+  // print(await Hive.boxExists('people'));
+
   await Hive.openBox<Person>('people');
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
-      //ChangeNotifierProvider<Box<Person>>(create: (_) => Hive.box("people")),
-      ChangeNotifierProvider<ScreenBloc>(create: (_) => ScreenBloc(_)),
-    ],
-    child: CompendiumApp(),
-  ));
+  runApp(CompendiumApp());
 }
 
 const Map<String, String> defaultSettings = {
@@ -42,17 +41,24 @@ const Map<String, String> defaultSettings = {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Compendium",
-      theme: ThemeData(
-        primarySwatch: CompendiumColors.primaryBlueBlack,
-        typography: Typography.material2018(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
+        //ChangeNotifierProvider<Box<Person>>(create: (_) => Hive.box("people")),
+        ChangeNotifierProvider<ScreenBloc>(create: (_) => ScreenBloc()),
+      ],
+      child: MaterialApp(
+        title: "Compendium",
+        theme: ThemeData(
+          primarySwatch: CompendiumColors.primaryBlueBlack,
+          typography: Typography.material2018(),
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => IndexScreen(),
+          '/person': (context) => PersonScreen(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => IndexScreen(),
-        '/person': (context) => PersonScreen(),
-      },
     );
   }
 }

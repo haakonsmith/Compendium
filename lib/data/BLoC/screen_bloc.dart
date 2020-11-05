@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ScreenBloc extends ChangeNotifier {
-  ScreenBloc(this.context);
-  final BuildContext context;
+  ScreenBloc();
 
   // You may be wondering how this works. Well, let me explain it to you.
   // So, the basic premise is, once the [_personId] is set, it will take you to the personScreen
@@ -15,6 +14,7 @@ class ScreenBloc extends ChangeNotifier {
   int _personId = -1;
   String _dataBlockId = "";
   String _attributeId = "";
+  BuildContext _buildContext;
 
   int get personId => _personId;
   String get dataBlockId => _dataBlockId;
@@ -26,7 +26,6 @@ class ScreenBloc extends ChangeNotifier {
     _personId = -1;
     _dataBlockId = "";
     _attributeId = "";
-    Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
     notifyListeners();
   }
 
@@ -45,10 +44,15 @@ class ScreenBloc extends ChangeNotifier {
     notifyListeners();
   }
 
+  set context(BuildContext context) {
+    _buildContext = context;
+  }
+
+  /// Warning: make sure you set context with the context setter first
   set personId(int newPersonId) {
     _personId = newPersonId;
     // push the new screen if we have a person ID to display
-    if (newPersonId > -1) Navigator.of(context).pushNamed("/person");
+    if (newPersonId > -1) Navigator.of(_buildContext).pushNamed("/person");
     notifyListeners();
   }
 

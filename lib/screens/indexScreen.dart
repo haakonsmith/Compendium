@@ -15,7 +15,7 @@ class _IndexScreenState extends State<IndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    box = Provider.of<Box<Person>>(context);
+    // box = Provider.of<Box<Person>>(context);
 
     return Scaffold(
       appBar: AppBar(

@@ -17,8 +17,9 @@ class _IndexScreenState extends State<IndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    box = Provider.of<Box<Person>>(context);
+    box = Hive.box('people');
     screenBloc = Provider.of<ScreenBloc>(context);
+    screenBloc.context = context;
 
     return Scaffold(
       appBar: AppBar(

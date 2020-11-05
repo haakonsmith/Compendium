@@ -26,8 +26,8 @@ class _PersonScreenState extends State<PersonScreen> {
   Person person;
 
   Future<void> load() async {
-    datablocksBox = Hive.box<Datablock>(person.databoxID);
-    loading = true;
+    datablocksBox = await Hive.openBox<Datablock>(person.databoxID);
+    loading = false;
     setState(() {});
   }
 
@@ -35,12 +35,16 @@ class _PersonScreenState extends State<PersonScreen> {
   Widget build(BuildContext context) {
     personBloc = Provider.of<PersonBloc>(context);
     screenBloc = Provider.of<ScreenBloc>(context);
+    screenBloc.context = context;
 
     box = Hive.box<Person>('people');
     person = box.get(screenBloc.personId);
 
+    print(person);
+
     if (person == null) {
-      screenBloc.clearPerson();
+      Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
+      person = Person.blank();
     }
 
     if (loading) {
@@ -60,12 +64,7 @@ class _PersonScreenState extends State<PersonScreen> {
             ? CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
               )
-            : ValueListenableBuilder(
-                valueListenable: personBloc.listenForDatablocks(),
-                builder: (context, box, widget) {
-                  return _buildListView(context, box);
-                },
-              ),
+            : _buildListView(context, datablocksBox),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
@@ -76,7 +75,7 @@ class _PersonScreenState extends State<PersonScreen> {
     );
   }
 
-  Widget _buildListView(BuildContext context, Box datablockBox) {
+  Widget _buildListView(BuildContext context, Box<Datablock> datablockBox) {
     if (datablockBox.length == 0) {
       return Center(
         child: Text(
