@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:compendium/data/theme.dart';
+import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
@@ -26,12 +26,12 @@ class Datablock {
   });
 
   Widget buildPreview(BuildContext context) {
+    final theme = context.appTheme;
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
-      shadowColor: CompendiumColors.primaryBlueBlack,
       elevation: 15,
       child: ClipPath(
         clipper: ShapeBorderClipper(
@@ -46,7 +46,8 @@ class Datablock {
           child: Container(
             // height: 180,
             decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: Color(colourValue), width: 15)),
+              border: Border(
+                  left: BorderSide(color: Color(colourValue), width: 15)),
               // color: Colors.white,
             ),
             padding: EdgeInsets.all(20.0),
