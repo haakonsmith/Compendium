@@ -16,6 +16,7 @@ class PersonAdapter extends TypeAdapter<Person> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
+    print(fields[2]);
     return Person(
       firstName: fields[0] as String,
       lastName: fields[1] as String,
@@ -39,9 +40,5 @@ class PersonAdapter extends TypeAdapter<Person> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PersonAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator ==(Object other) => identical(this, other) || other is PersonAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }

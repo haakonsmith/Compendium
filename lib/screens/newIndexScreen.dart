@@ -1,6 +1,6 @@
+import 'package:compendium/data/BLoC/screen_bloc.dart';
 import 'package:compendium/data/person.dart';
-import 'package:compendium/screens/personScreen.dart';
-import 'package:compendium/theme.dart';
+import 'package:compendium/screens/newPersonScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -13,55 +13,63 @@ class IndexScreen extends StatefulWidget {
 
 class _IndexScreenState extends State<IndexScreen> {
   Box<Person> box;
+  ScreenBloc screenBloc;
 
   @override
   Widget build(BuildContext context) {
-    // box = Provider.of<Box<Person>>(context);
+    box = Hive.box('people');
+    screenBloc = Provider.of<ScreenBloc>(context);
+    screenBloc.context = context;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('People'),
       ),
       body: Container(
-        child: ValueListenableBuilder(
-          valueListenable: box.listenable(),
-          builder: (context, box, widget) {
-            return _buildListView(context, box);
-          },
-        ),
+        child: _buildListView(context),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            Provider.of<CompendiumThemeData>(context, listen: false)
-                .swapTheme(),
+        onPressed: () => getNewPerson(context).then((val) {
+          val.databoxID = box.length.toString();
+          box.add(val);
+          setState(() {});
+        }),
         child: Icon(Icons.add),
       ),
     );
   }
 
-  ListView _buildListView(BuildContext context, Box<Person> peopleBox) {
+  ListView _buildListView(BuildContext context) {
     return ListView.separated(
-      itemCount: peopleBox.length,
+      itemCount: box.length,
       itemBuilder: (context, index) {
-        Person person = peopleBox.getAt(index);
+        Person person = box.getAt(index);
         return ListTile(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(person.firstName + " " + person.lastName,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              Text(person.firstName + " " + person.lastName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                       title: Text('Are you sure?'),
                       content: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+                          RaisedButton(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Theme.of(context).primaryColor,
+                            onPressed: () {
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
+                            },
+                          ),
                           RaisedButton(
                             child: Text(
                               "Delete",
@@ -70,19 +78,8 @@ class _IndexScreenState extends State<IndexScreen> {
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
                               box.deleteAt(index);
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
-                            },
-                          ),
-                          RaisedButton(
-                            child: Text(
-                              "Cancel",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
+                              setState(() {});
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
                             },
                           ),
                         ],
@@ -93,17 +90,10 @@ class _IndexScreenState extends State<IndexScreen> {
               )
             ],
           ),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => PersonView(personIndex: index),
-            ),
-          ),
+          onTap: () => screenBloc.personId = index,
         );
       },
-      separatorBuilder: (context, index) => Divider(
-          height: 20,
-          indent: MediaQuery.of(context).size.width * 0.05,
-          endIndent: MediaQuery.of(context).size.width * 0.05),
+      separatorBuilder: (context, index) => Divider(height: 20, indent: MediaQuery.of(context).size.width * 0.05, endIndent: MediaQuery.of(context).size.width * 0.05),
     );
   }
 }
@@ -120,8 +110,7 @@ Future<Person> getNewPerson(BuildContext context) async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           title: Text('Add person'),
           content: Form(
             key: _formKey,
@@ -162,6 +151,14 @@ Future<Person> getNewPerson(BuildContext context) async {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       RaisedButton(
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                        child: Text(
+                          "Discard",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      RaisedButton(
                         child: Text(
                           "Save",
                           style: TextStyle(color: Colors.white),
@@ -175,28 +172,15 @@ Future<Person> getNewPerson(BuildContext context) async {
                               databoxID: "",
                             );
 
-                            item.firstName =
-                                "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
-                            item.lastName =
-                                "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
+                            item.firstName = "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
+                            item.lastName = "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
 
                             // Keep form state incase user wants to go back to form
                             _formKey.currentState.save();
 
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('dialog');
+                            Navigator.of(context, rootNavigator: true).pop('dialog');
                           }
                         },
-                      ),
-                      RaisedButton(
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () =>
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('dialog'),
-                        child: Text(
-                          "Discard",
-                          style: TextStyle(color: Colors.white),
-                        ),
                       ),
                     ],
                   ),

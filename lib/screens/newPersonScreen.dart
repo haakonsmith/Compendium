@@ -1,4 +1,5 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
+import 'package:compendium/data/BLoC/screen_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/data/person.dart';
 import 'package:compendium/vendor/color_picker.dart';
@@ -9,41 +10,53 @@ import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
-class PersonView extends StatefulWidget {
+class PersonScreen extends StatefulWidget {
   static final String routeName = '/person';
-  final int personIndex;
-
-  PersonView({Key key, this.personIndex}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _PersonViewState();
+  State<StatefulWidget> createState() => _PersonScreenState();
 }
 
-class _PersonViewState extends State<PersonView> {
+class _PersonScreenState extends State<PersonScreen> {
   Box<Datablock> datablocksBox;
+  Box<Person> box;
   bool loading = true;
   PersonBloc personBloc;
+  ScreenBloc screenBloc;
   Person person;
 
-  Future<void> _loadData() async {
-    await personBloc.setActivePerson(person);
-
-    setState(() => loading = false);
+  Future<void> load() async {
+    datablocksBox = await Hive.openBox<Datablock>(person.databoxID);
+    loading = false;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     personBloc = Provider.of<PersonBloc>(context);
+    screenBloc = Provider.of<ScreenBloc>(context);
+    screenBloc.context = context;
+
+    box = Hive.box<Person>('people');
+    person = box.get(screenBloc.personId);
+
+    print(person);
+
+    if (person == null) {
+      Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
+      person = Person.blank();
+    }
 
     if (loading) {
-      personBloc.setActivePersonFromIndex(widget.personIndex);
-      person = personBloc.activePerson;
-
-      _loadData();
+      load();
     }
+
     return Scaffold(
-      // probably need to add a top selecting thing kinda like channel page in the Youtube app
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => screenBloc.clearPerson(),
+        ),
         title: Text(person.firstName),
       ),
       body: Center(
@@ -51,24 +64,18 @@ class _PersonViewState extends State<PersonView> {
             ? CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
               )
-            : ValueListenableBuilder(
-                valueListenable: personBloc.listenForDatablocks(),
-                builder: (context, box, widget) {
-                  return _buildListView(context, box);
-                }),
+            : _buildListView(context, datablocksBox),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
         // so I'm just doing this to avoid copy-pasting the dialog code here too
-        onPressed: () => getNewDatablock(
-          context: context,
-        ).then((val) => personBloc.addDatablockToActivePerson(val)),
+        onPressed: () => getNewDatablock(context),
       ),
     );
   }
 
-  Widget _buildListView(BuildContext context, Box datablockBox) {
+  Widget _buildListView(BuildContext context, Box<Datablock> datablockBox) {
     if (datablockBox.length == 0) {
       return Center(
         child: Text(
@@ -86,9 +93,7 @@ class _PersonViewState extends State<PersonView> {
     );
   }
 
-  Future<Datablock> getNewDatablock({
-    @required BuildContext context,
-  }) async {
+  Future<Datablock> getNewDatablock(BuildContext context) async {
     TextEditingController nameController = TextEditingController();
 
     final _formKey = GlobalKey<FormState>();
@@ -101,7 +106,7 @@ class _PersonViewState extends State<PersonView> {
         builder: (BuildContext context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text('Add person'),
+            title: Text('Add Datablock'),
             content: Form(
               key: _formKey,
               child: Column(
@@ -143,6 +148,8 @@ class _PersonViewState extends State<PersonView> {
                             print(colourController);
                             if (_formKey.currentState.validate()) {
                               item = Datablock(name: nameController.text, colourValue: colourController.value);
+
+                              datablocksBox.add(item);
 
                               _formKey.currentState.save(); // what does this do?
 

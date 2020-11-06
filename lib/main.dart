@@ -1,6 +1,8 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
+import 'package:compendium/data/BLoC/screen_bloc.dart';
 import 'package:compendium/data/datablock.dart';
-import 'package:compendium/screens/indexScreen.dart';
+import 'package:compendium/screens/newIndexScreen.dart';
+import 'package:compendium/screens/newPersonScreen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
@@ -15,22 +17,21 @@ import 'theme.dart';
 void main() async {
   await Hive.initFlutter();
 
-  Hive.registerAdapter(PersonAdapter());
   Hive.registerAdapter(DatablockAdapter());
+  Hive.registerAdapter(PersonAdapter());
 
-  var settingsBox = await Hive.openBox<Map<String, String>>('settings');
+  // await Hive.openBox<Map<String, String>>('settings');
+
+  // print(await Hive.boxExists('people'));
+  // await Hive.deleteFromDisk();
+  // print(await Hive.boxExists('people'));
+  // await Hive.deleteBoxFromDisk('people');
+  // print(await Hive.boxExists('people'));
 
   await Hive.openBox<Person>('people');
 
-  runApp(MultiProvider(
-    providers: [
-      Provider<PersonBloc>(create: (_) => PersonBloc()),
-      Provider<Box<Person>>(
-        create: (_) => Hive.box("people"),
-      )
-    ],
-    child: CompendiumTheme(child: CompendiumApp()),
-  ));
+
+  runApp(CompendiumApp());
 }
 
 const Map<String, String> defaultSettings = {
@@ -41,10 +42,21 @@ const Map<String, String> defaultSettings = {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Compendium",
-      theme: context.appTheme.materialTheme,
-      home: IndexScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
+        //ChangeNotifierProvider<Box<Person>>(create: (_) => Hive.box("people")),
+        ChangeNotifierProvider<ScreenBloc>(create: (_) => ScreenBloc()),
+      ],
+      child: MaterialApp(
+        title: "Compendium",
+        theme: context.appTheme.materialTheme,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => IndexScreen(),
+          '/person': (context) => PersonScreen(),
+        },
+      ),
     );
   }
 }
