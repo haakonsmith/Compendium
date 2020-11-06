@@ -26,7 +26,6 @@ class Datablock {
   });
 
   Widget buildPreview(BuildContext context) {
-    final theme = context.appTheme;
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
     return Card(
       shape: RoundedRectangleBorder(
@@ -46,8 +45,7 @@ class Datablock {
           child: Container(
             // height: 180,
             decoration: BoxDecoration(
-              border: Border(
-                  left: BorderSide(color: Color(colourValue), width: 15)),
+              border: Border(left: BorderSide(color: Color(colourValue), width: 15)),
               // color: Colors.white,
             ),
             padding: EdgeInsets.all(20.0),

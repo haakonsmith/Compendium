@@ -3,6 +3,8 @@ import 'package:compendium/data/BLoC/screen_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/screens/newIndexScreen.dart';
 import 'package:compendium/screens/newPersonScreen.dart';
+import 'package:compendium/screens/screenController.dart';
+import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
@@ -12,15 +14,15 @@ import 'package:compendium/data/person.dart';
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:provider/provider.dart';
 
-import 'theme.dart';
-
 void main() async {
-  await Hive.initFlutter();
+  await Hive.initFlutter("hiveData");
 
   Hive.registerAdapter(DatablockAdapter());
   Hive.registerAdapter(PersonAdapter());
 
-  // await Hive.openBox<Map<String, String>>('settings');
+  var settingsBox = await Hive.openBox('settings');
+
+  settingsBox.put
 
   // print(await Hive.boxExists('people'));
   // await Hive.deleteFromDisk();
@@ -30,8 +32,15 @@ void main() async {
 
   await Hive.openBox<Person>('people');
 
-
-  runApp(CompendiumApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CompendiumThemeData>(create: (_) => CompendiumThemeData()),
+        ChangeNotifierProvider<ScreenBloc>(create: (_) => ScreenBloc()),
+      ],
+      child: CompendiumApp(),
+    ),
+  );
 }
 
 const Map<String, String> defaultSettings = {
@@ -42,21 +51,10 @@ const Map<String, String> defaultSettings = {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
-        //ChangeNotifierProvider<Box<Person>>(create: (_) => Hive.box("people")),
-        ChangeNotifierProvider<ScreenBloc>(create: (_) => ScreenBloc()),
-      ],
-      child: MaterialApp(
-        title: "Compendium",
-        theme: context.appTheme.materialTheme,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => IndexScreen(),
-          '/person': (context) => PersonScreen(),
-        },
-      ),
+    return MaterialApp(
+      theme: CompendiumThemeData.of(context).materialTheme,
+      title: "Compendium",
+      home: ScreenController(),
     );
   }
 }

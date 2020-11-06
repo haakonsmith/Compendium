@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CompendiumThemeData extends ChangeNotifier {
-  BuildContext context;
-
-  CompendiumThemeData(this.context);
-
   static MaterialColor primaryBlueBlack = MaterialColor(
     blueBlackPrimaryValue,
     <int, Color>{
@@ -48,17 +44,35 @@ class CompendiumThemeData extends ChangeNotifier {
   final BorderRadius borderRadius = BorderRadius.circular(20);
 
   final lightTheme = ThemeData(
-      primarySwatch: primaryBlueBlack,
-      textTheme: Typography.blackCupertino,
-      typography: Typography.material2018());
+    primarySwatch: primaryBlueBlack,
+    textTheme: Typography.blackCupertino,
+    cardTheme: CardTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+    ),
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+    ),
+    typography: Typography.material2018(),
+  );
 
   final darkTheme = ThemeData(
-      primarySwatch: primaryPurple,
-      scaffoldBackgroundColor: Colors.grey.shade900,
-      cardColor: Colors.grey.shade900,
-      dialogBackgroundColor: Colors.grey.shade900,
-      textTheme: Typography.whiteCupertino,
-      typography: Typography.material2018());
+    primarySwatch: primaryPurple,
+    scaffoldBackgroundColor: Colors.grey.shade900,
+    cardColor: Colors.grey.shade900,
+    cardTheme: CardTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+    ),
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+    ),
+    appBarTheme: AppBarTheme(),
+    textTheme: Typography.whiteCupertino,
+    typography: Typography.material2018(),
+  );
 
   ThemeData get materialTheme {
     return isDark ? darkTheme : lightTheme;
@@ -68,22 +82,8 @@ class CompendiumThemeData extends ChangeNotifier {
     isDark = !isDark;
     notifyListeners();
   }
-}
 
-class CompendiumTheme extends StatelessWidget {
-  final Widget child;
-
-  CompendiumTheme({this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final themeData = CompendiumThemeData(context);
-    return ChangeNotifierProvider.value(value: themeData, child: child);
-  }
-}
-
-extension BuildContextExtension on BuildContext {
-  CompendiumThemeData get appTheme {
-    return watch<CompendiumThemeData>();
+  static CompendiumThemeData of(BuildContext context) {
+    return Provider.of<CompendiumThemeData>(context);
   }
 }

@@ -7,6 +7,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 class IndexScreen extends StatefulWidget {
+  static final String routeName = '/';
+
   @override
   _IndexScreenState createState() => _IndexScreenState();
 }
@@ -19,8 +21,6 @@ class _IndexScreenState extends State<IndexScreen> {
   Widget build(BuildContext context) {
     box = Hive.box('people');
     screenBloc = Provider.of<ScreenBloc>(context);
-    screenBloc.context = context;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('People'),
@@ -110,7 +110,6 @@ Future<Person> getNewPerson(BuildContext context) async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           title: Text('Add person'),
           content: Form(
             key: _formKey,

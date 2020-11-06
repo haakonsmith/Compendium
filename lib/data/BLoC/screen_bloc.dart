@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+enum CurrentScreen {
+  person,
+  settings,
+  node, // not added yet
+}
+
 class ScreenBloc extends ChangeNotifier {
   ScreenBloc();
 
@@ -14,11 +20,12 @@ class ScreenBloc extends ChangeNotifier {
   int _personId = -1;
   String _dataBlockId = "";
   String _attributeId = "";
-  BuildContext _buildContext;
+  CurrentScreen _currentScreen = CurrentScreen.person;
 
   int get personId => _personId;
   String get dataBlockId => _dataBlockId;
   String get attributeId => _attributeId;
+  CurrentScreen get currentScreen => _currentScreen;
 
   /// This just sets the person ID to ""
   /// it doesn't delete the person or anything
@@ -44,15 +51,11 @@ class ScreenBloc extends ChangeNotifier {
     notifyListeners();
   }
 
-  set context(BuildContext context) {
-    _buildContext = context;
-  }
-
   /// Warning: make sure you set context with the context setter first
   set personId(int newPersonId) {
     _personId = newPersonId;
-    // push the new screen if we have a person ID to display
-    if (newPersonId > -1) Navigator.of(_buildContext).pushNamed("/person");
+    // // push the new screen if we have a person ID to display
+    // if (newPersonId > -1) Navigator.of(_buildContext).pushNamed("/person");
     notifyListeners();
   }
 
@@ -75,6 +78,11 @@ class ScreenBloc extends ChangeNotifier {
     } else {
       print("_attributeId is trying to be set with $newAttributeId when _personId is empty.");
     }
+    notifyListeners();
+  }
+
+  set currentScreen(CurrentScreen newScreen) {
+    _currentScreen = newScreen;
     notifyListeners();
   }
 }

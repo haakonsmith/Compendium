@@ -35,7 +35,6 @@ class _PersonScreenState extends State<PersonScreen> {
   Widget build(BuildContext context) {
     personBloc = Provider.of<PersonBloc>(context);
     screenBloc = Provider.of<ScreenBloc>(context);
-    screenBloc.context = context;
 
     box = Hive.box<Person>('people');
     person = box.get(screenBloc.personId);
@@ -105,7 +104,6 @@ class _PersonScreenState extends State<PersonScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
             title: Text('Add Datablock'),
             content: Form(
               key: _formKey,
