@@ -12,7 +12,7 @@ import 'package:compendium/data/person.dart';
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:provider/provider.dart';
 
-import 'data/theme.dart';
+import 'theme.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -29,6 +29,7 @@ void main() async {
   // print(await Hive.boxExists('people'));
 
   await Hive.openBox<Person>('people');
+
 
   runApp(CompendiumApp());
 }
@@ -49,10 +50,7 @@ class CompendiumApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: "Compendium",
-        theme: ThemeData(
-          primarySwatch: CompendiumColors.primaryBlueBlack,
-          typography: Typography.material2018(),
-        ),
+        theme: context.appTheme.materialTheme,
         initialRoute: '/',
         routes: {
           '/': (context) => IndexScreen(),
