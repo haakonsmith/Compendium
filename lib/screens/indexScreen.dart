@@ -1,10 +1,10 @@
+import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/person.dart';
 import 'package:compendium/screens/personScreen.dart';
-import 'package:compendium/theme.dart';
+import 'package:compendium/widgets/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 
 class IndexScreen extends StatefulWidget {
   @override
@@ -13,15 +13,18 @@ class IndexScreen extends StatefulWidget {
 
 class _IndexScreenState extends State<IndexScreen> {
   Box<Person> box;
+  PersonBloc personBloc;
 
   @override
   Widget build(BuildContext context) {
-    // box = Provider.of<Box<Person>>(context);
+    box = Hive.box('people');
+    personBloc = PersonBloc.of(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('People'),
       ),
+      drawer: NavDrawer(),
       body: Container(
         child: ValueListenableBuilder(
           valueListenable: box.listenable(),
@@ -32,8 +35,7 @@ class _IndexScreenState extends State<IndexScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
-            Provider.of<CompendiumThemeData>(context, listen: false)
-                .swapTheme(),
+            getNewPerson(context).then((value) => personBloc.addPerson(value)),
         child: Icon(Icons.add),
       ),
     );
@@ -93,11 +95,7 @@ class _IndexScreenState extends State<IndexScreen> {
               )
             ],
           ),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => PersonView(personIndex: index),
-            ),
-          ),
+          onTap: () => Navigator.of(context).pushNamed("/person/$index"),
         );
       },
       separatorBuilder: (context, index) => Divider(
@@ -135,9 +133,7 @@ Future<Person> getNewPerson(BuildContext context) async {
                     controller: firstnameController,
                     // The validator receives the text that the user has entered.
                     validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter some text';
-                      }
+                      if (value.isEmpty) return 'Please enter some text';
                       return null;
                     },
                   ),
@@ -149,9 +145,7 @@ Future<Person> getNewPerson(BuildContext context) async {
                     controller: lastnameController,
                     // The validator receives the text that the user has entered.
                     validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter some text';
-                      }
+                      if (value.isEmpty) return 'Please enter some text';
                       return null;
                     },
                   ),

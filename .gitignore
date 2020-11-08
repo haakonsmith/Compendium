@@ -114,7 +114,7 @@ app.*.map.json
 coverage/
 
 # Symbols
-app.*.symbols
+app.*.symbols   
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3

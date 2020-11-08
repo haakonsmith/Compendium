@@ -23,4 +23,9 @@ class Person {
   static Person blank() {
     return Person(firstName: "", lastName: "", databoxID: "");
   }
+
+  @override
+  String toString() {
+    return "$firstName $lastName";
+  }
 }

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CompendiumThemeData extends ChangeNotifier {
+  bool isDark;
+
+  CompendiumThemeData({this.isDark});
+
   static MaterialColor primaryBlueBlack = MaterialColor(
     blueBlackPrimaryValue,
     <int, Color>{
@@ -37,11 +41,19 @@ class CompendiumThemeData extends ChangeNotifier {
 
   static const int purplePrimaryValue = 0xFF48327f;
 
-  bool isDark = false;
-
   final Color colorPrimary = Color(blueBlackPrimaryValue);
 
   final BorderRadius borderRadius = BorderRadius.circular(20);
+
+  Widget get dataLoadingIndicator => CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+        materialTheme.primaryColor,
+      ));
+  // White if it's darktheme, else just leave it.
+  ListTileTheme listTileTheme({child}) => ListTileTheme(
+        iconColor: isDark ? Colors.white : null,
+        child: child,
+      );
 
   final lightTheme = ThemeData(
     primarySwatch: primaryBlueBlack,
@@ -60,7 +72,19 @@ class CompendiumThemeData extends ChangeNotifier {
   final darkTheme = ThemeData(
     primarySwatch: primaryPurple,
     scaffoldBackgroundColor: Colors.grey.shade900,
+    dialogBackgroundColor: Colors.grey.shade900,
     cardColor: Colors.grey.shade900,
+    inputDecorationTheme: InputDecorationTheme(
+      hintStyle: TextStyle(
+        color: Colors.white,
+      ),
+      border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+      labelStyle: TextStyle(
+        decorationColor: Colors.white,
+        color: Colors.white,
+      ),
+    ),
+    iconTheme: IconThemeData(color: Colors.white),
     cardTheme: CardTheme(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -83,7 +107,7 @@ class CompendiumThemeData extends ChangeNotifier {
     notifyListeners();
   }
 
-  static CompendiumThemeData of(BuildContext context) {
-    return Provider.of<CompendiumThemeData>(context);
+  static CompendiumThemeData of(BuildContext context, {listen: true}) {
+    return Provider.of<CompendiumThemeData>(context, listen: listen);
   }
 }

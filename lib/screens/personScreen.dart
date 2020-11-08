@@ -1,56 +1,45 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/data/person.dart';
+import 'package:compendium/theme.dart';
 import 'package:compendium/vendor/color_picker.dart';
 import 'package:compendium/widgets/attributes.dart';
 import 'package:compendium/widgets/color_form_field.dart';
+import 'package:compendium/widgets/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
-class PersonView extends StatefulWidget {
+class PersonScreen extends StatefulWidget {
   static final String routeName = '/person';
   final int personIndex;
 
-  PersonView({Key key, this.personIndex}) : super(key: key);
+  PersonScreen({Key key, this.personIndex}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _PersonViewState();
+  State<StatefulWidget> createState() => _PersonScreenState();
 }
 
-class _PersonViewState extends State<PersonView> {
+class _PersonScreenState extends State<PersonScreen> {
   Box<Datablock> datablocksBox;
   bool loading = true;
   PersonBloc personBloc;
-  Person person;
-
-  Future<void> _loadData() async {
-    await personBloc.setActivePerson(person);
-
-    setState(() => loading = false);
-  }
 
   @override
   Widget build(BuildContext context) {
-    personBloc = Provider.of<PersonBloc>(context);
+    personBloc = PersonBloc.of(context, listen: true);
 
-    if (loading) {
-      personBloc.setActivePersonFromIndex(widget.personIndex);
-      person = personBloc.activePerson;
-
-      _loadData();
-    }
     return Scaffold(
       // probably need to add a top selecting thing kinda like channel page in the Youtube app
+      // Elaborate....
       appBar: AppBar(
-        title: Text(person.firstName),
+        title: Text(personBloc.getActivePerson.firstName),
       ),
-      body: Center(
-        child: loading
-            ? CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-              )
+      drawer: NavDrawer(),
+      body: Container(
+        child: personBloc.loading
+            ? CompendiumThemeData.of(context).dataLoadingIndicator
             : ValueListenableBuilder(
                 valueListenable: personBloc.listenForDatablocks(),
                 builder: (context, box, widget) {
@@ -100,7 +89,8 @@ class _PersonViewState extends State<PersonView> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
             title: Text('Add person'),
             content: Form(
               key: _formKey,
@@ -110,7 +100,8 @@ class _PersonViewState extends State<PersonView> {
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: TextFormField(
-                      decoration: InputDecoration(labelText: 'Enter datablock title'),
+                      decoration:
+                          InputDecoration(labelText: 'Enter datablock title'),
                       controller: nameController,
                       // The validator receives the text that the user has entered.
                       validator: (value) {
@@ -126,7 +117,9 @@ class _PersonViewState extends State<PersonView> {
                       child: ColorFormField(
                         onChanged: (color) => (colourController = color),
                         // Black by default, there's probably a better way to do this
-                        intialColor: colourController == null ? Colors.black : colourController,
+                        intialColor: colourController == null
+                            ? Colors.black
+                            : colourController,
                       )),
                   Padding(
                     padding: EdgeInsets.all(8.0),
@@ -142,17 +135,23 @@ class _PersonViewState extends State<PersonView> {
                           onPressed: () {
                             print(colourController);
                             if (_formKey.currentState.validate()) {
-                              item = Datablock(name: nameController.text, colourValue: colourController.value);
+                              item = Datablock(
+                                  name: nameController.text,
+                                  colourValue: colourController.value);
 
-                              _formKey.currentState.save(); // what does this do?
+                              _formKey.currentState
+                                  .save(); // what does this do?
 
-                              Navigator.of(context, rootNavigator: true).pop('dialog');
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop('dialog');
                             }
                           },
                         ),
                         RaisedButton(
                           color: Theme.of(context).primaryColor,
-                          onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop('dialog'),
                           child: Text(
                             "Discard",
                             style: TextStyle(color: Colors.white),
