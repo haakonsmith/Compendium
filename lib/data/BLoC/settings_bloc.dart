@@ -16,7 +16,7 @@ class SettingsBloc extends ChangeNotifier {
   Future<void> _init() async {
     _loading = true;
     // set defaults
-    if (await Hive.boxExists('settings')) {
+    if (!(await Hive.boxExists('settings'))) {
       _settingsBox = await Hive.openBox('settings');
 
       await _settingsBox.putAll(defaultSettings);
@@ -47,12 +47,12 @@ class SettingsBloc extends ChangeNotifier {
     }
 
     // In the future there may be more than a light or dark theme, but for now we'll convert a string to a bool.
-    return _settingsBox.get("theme") == "light" ? true : false;
+    return _settingsBox.get("theme") == "light" ? false : true;
   }
 
   set darkTheme(bool value) {
     // In the future there may be more than a light or dark theme, but for now we'll convert a bool to a string.
-    _settingsBox.put("theme", value ? "light" : "dark");
+    _settingsBox.put("theme", value ? "dark" : "light");
     notifyListeners();
   }
 }

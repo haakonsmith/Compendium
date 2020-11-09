@@ -1,6 +1,6 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/person.dart';
-import 'package:compendium/screens/personScreen.dart';
+import 'package:compendium/screens/person_screen.dart';
 import 'package:compendium/widgets/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';

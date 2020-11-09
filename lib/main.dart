@@ -1,9 +1,9 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/BLoC/settings_bloc.dart';
 import 'package:compendium/data/datablock.dart';
-import 'package:compendium/screens/indexScreen.dart';
-import 'package:compendium/screens/personScreen.dart';
-import 'package:compendium/screens/settingsScreen.dart';
+import 'package:compendium/screens/index_screen.dart';
+import 'package:compendium/screens/person_screen.dart';
+import 'package:compendium/screens/settings_screen.dart';
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
 
