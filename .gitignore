@@ -52,6 +52,7 @@ analysis_benchmark.json
 .pub-cache/
 .pub/
 /build/
+pubspec.lock
 
 # Flutter-related
 **/Flutter/ephemeral/
@@ -109,6 +110,7 @@ app.*.map.json
 **/macos/Flutter/Flutter-Debug.xcconfig
 **/macos/Flutter/Flutter-Release.xcconfig
 **/macos/Flutter/Flutter-Profile.xcconfig
+**/Podfile.lock
 
 # Coverage
 coverage/
