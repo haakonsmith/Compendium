@@ -50,7 +50,7 @@ class CompendiumThemeData extends ChangeNotifier {
         materialTheme.primaryColor,
       ));
   // White if it's darktheme, else just leave it.
-  ListTileTheme listTileTheme({child}) => ListTileTheme(
+  ListTileTheme listTileTheme({Widget child}) => ListTileTheme(
         iconColor: isDark ? Colors.white : null,
         child: child,
       );

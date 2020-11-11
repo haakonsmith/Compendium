@@ -1,6 +1,9 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/BLoC/settings_bloc.dart';
 import 'package:compendium/data/datablock.dart';
+import 'package:compendium/routers/instant_page_route.dart';
+import 'package:compendium/routers/nested_page_route.dart';
+import 'package:compendium/screens/datablock_screen.dart';
 import 'package:compendium/screens/index_screen.dart';
 import 'package:compendium/screens/person_screen.dart';
 import 'package:compendium/screens/settings_screen.dart';
@@ -24,10 +27,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<CompendiumThemeData>(
-            create: (_) => CompendiumThemeData()),
+        ChangeNotifierProvider<CompendiumThemeData>(create: (_) => CompendiumThemeData()),
         ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
-        ChangeNotifierProvider<SettingsBloc>(create: (_) => SettingsBloc())
+        ChangeNotifierProvider<SettingsBloc>(create: (_) => SettingsBloc()),
       ],
       child: CompendiumApp(),
     ),
@@ -37,8 +39,7 @@ void main() async {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    CompendiumThemeData.of(context).isDark =
-        SettingsBloc.of(context, listen: true).darkTheme;
+    CompendiumThemeData.of(context).isDark = SettingsBloc.of(context, listen: true).darkTheme;
 
     return MaterialApp(
         theme: CompendiumThemeData.of(context).materialTheme,
@@ -48,24 +49,36 @@ class CompendiumApp extends StatelessWidget {
         // combined with the personBloc I think it works
         onGenerateRoute: (settings) {
           if (settings.name == '/index') {
-            return MaterialPageRoute(builder: (context) => IndexScreen());
+            return InstantPageRoute(builder: (context) => IndexScreen());
           }
 
           if (settings.name == "/settings") {
-            return MaterialPageRoute(builder: (context) => SettingsScreen());
+            return InstantPageRoute(builder: (context) => SettingsScreen());
           }
 
           // Handle '/person/:index'
-          var uri = Uri.parse(settings.name);
-          if (uri.pathSegments.length == 2 &&
-              uri.pathSegments.first == 'person') {
-            var index = int.parse(uri.pathSegments[1]);
-            PersonBloc.of(context).setActivePersonFromIndex(index);
-            return MaterialPageRoute(builder: (context) => PersonScreen());
+          var uriSegments = Uri.parse(settings.name).pathSegments;
+          if (uriSegments.first == 'person' && uriSegments.length == 2) {
+            var personIndex = int.parse(uriSegments[1]);
+
+            PersonBloc.of(context).setActivePersonFromIndex(personIndex);
+
+            return NestedPageRoute(builder: (context) => PersonScreen());
           }
 
-          // TODO: Implement [UnknownScreen]
-          // return MaterialPageRoute(builder: (context) => UnknownScreen());
+          if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
+            if (PersonBloc.of(context).activePerson == null) {
+              return MaterialPageRoute(builder: (context) => IndexScreen());
+            }
+            return NestedPageRoute(
+              builder: (context) => DatablockScreen(
+                datablockIndex: int.parse(uriSegments[1]),
+              ),
+            );
+          }
+
+          // index should be the default
+          return InstantPageRoute(builder: (context) => IndexScreen());
         });
   }
 }

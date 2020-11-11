@@ -2,26 +2,26 @@ import 'package:compendium/vendor/color_picker.dart';
 import 'package:flutter/material.dart';
 
 class ColorFormField extends StatefulWidget {
-  final Color intialColor;
-  Color colorController;
-  dynamic onChanged;
+  ColorFormField({Key key, this.onChanged, @required this.initialColor});
 
-  ColorFormField({Key key, this.onChanged, @required this.intialColor}) : super(key: key) {
-    colorController = intialColor;
-  }
+  final Color initialColor;
+  final void Function(Color) onChanged;
 
   @override
   State<StatefulWidget> createState() => _ColorFormFieldState();
 }
 
 class _ColorFormFieldState extends State<ColorFormField> {
+  Color colorController;
   @override
   Widget build(BuildContext context) {
+    colorController ??= widget.initialColor;
+
     return InkWell(
       onTap: () {
-        getColor(context: context, intialColor: widget.intialColor).then((value) {
+        getColor(context: context, initialColor: widget.initialColor).then((value) {
           widget.onChanged(value);
-          setState(() => widget.colorController = value);
+          setState(() => colorController = value);
         });
       },
       child: Row(
@@ -29,7 +29,7 @@ class _ColorFormFieldState extends State<ColorFormField> {
           Container(
             width: 20,
             height: 20,
-            color: widget.colorController,
+            color: colorController,
           ),
           SizedBox(width: 10),
           Text("Pick a colour")
@@ -38,48 +38,51 @@ class _ColorFormFieldState extends State<ColorFormField> {
     );
   }
 
-  static Future<Color> getColor({@required BuildContext context, @required Color intialColor}) async {
-    Color colorController = intialColor;
+  static Future<Color> getColor({@required BuildContext context, @required Color initialColor}) async {
+    Color colorController = initialColor;
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Colour Picker"),
-        content: Column(
-          children: [
-            CircleColorPicker(
-              initialColor: intialColor,
-              onChanged: (color) => (colorController = color),
-              size: const Size(240, 240),
-              strokeWidth: 4,
-              thumbSize: 36,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(
-                  child: Text(
-                    "Save",
-                    style: TextStyle(color: Colors.white),
+        content: Container(
+          height: 300,
+          child: Column(
+            children: [
+              CircleColorPicker(
+                initialColor: initialColor,
+                onChanged: (color) => (colorController = color),
+                size: Size(240, 240),
+                strokeWidth: 4,
+                thumbSize: 36,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RaisedButton(
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () {
+                      // Make it null so we don't update anything if discarded
+                      colorController = null;
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                    },
+                    child: Text(
+                      "Discard",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  color: Theme.of(context).primaryColor,
-                  onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
-                ),
-                RaisedButton(
-                  color: Theme.of(context).primaryColor,
-                  onPressed: () {
-                    // Make it null so we don't update anything if discarded
-                    colorController = null;
-                    Navigator.of(context, rootNavigator: true).pop('dialog');
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(color: Colors.white),
+                  RaisedButton(
+                    child: Text(
+                      "Save",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
                   ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

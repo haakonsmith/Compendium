@@ -16,7 +16,6 @@ class PersonAdapter extends TypeAdapter<Person> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    print(fields[2]);
     return Person(
       firstName: fields[0] as String,
       lastName: fields[1] as String,

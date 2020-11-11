@@ -31,12 +31,10 @@ class _PersonScreenState extends State<PersonScreen> {
     personBloc = PersonBloc.of(context, listen: true);
 
     return Scaffold(
-      // probably need to add a top selecting thing kinda like channel page in the Youtube app
-      // Elaborate....
       appBar: AppBar(
-        title: Text(personBloc.getActivePerson.firstName),
+        title: Text(personBloc.activePerson.firstName),
       ),
-      drawer: NavDrawer(),
+      // drawer: NavDrawer(),
       body: Container(
         child: personBloc.loading
             ? CompendiumThemeData.of(context).dataLoadingIndicator
@@ -44,20 +42,21 @@ class _PersonScreenState extends State<PersonScreen> {
                 valueListenable: personBloc.listenForDatablocks(),
                 builder: (context, box, widget) {
                   return _buildListView(context, box);
-                }),
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
         // so I'm just doing this to avoid copy-pasting the dialog code here too
-        onPressed: () => getNewDatablock(
-          context: context,
-        ).then((val) => personBloc.addDatablockToActivePerson(val)),
+        onPressed: () => getNewDatablock(context).then(
+          (val) => personBloc.addDatablockToActivePerson(val),
+        ),
       ),
     );
   }
 
-  Widget _buildListView(BuildContext context, Box datablockBox) {
+  Widget _buildListView(BuildContext context, Box<Datablock> datablockBox) {
     if (datablockBox.length == 0) {
       return Center(
         child: Text(
@@ -70,14 +69,12 @@ class _PersonScreenState extends State<PersonScreen> {
     return ListView.builder(
       itemCount: datablockBox.length,
       itemBuilder: (context, index) {
-        return datablockBox.getAt(index).buildPreview(context);
+        return datablockBox.getAt(index).buildPreview(context, index);
       },
     );
   }
 
-  Future<Datablock> getNewDatablock({
-    @required BuildContext context,
-  }) async {
+  Future<Datablock> getNewDatablock(BuildContext context) async {
     TextEditingController nameController = TextEditingController();
 
     final _formKey = GlobalKey<FormState>();
@@ -89,9 +86,8 @@ class _PersonScreenState extends State<PersonScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)),
-            title: Text('Add person'),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            title: Text('Add Category'),
             content: Form(
               key: _formKey,
               child: Column(
@@ -100,8 +96,8 @@ class _PersonScreenState extends State<PersonScreen> {
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: TextFormField(
-                      decoration:
-                          InputDecoration(labelText: 'Enter datablock title'),
+                      cursorColor: Theme.of(context).primaryColor,
+                      decoration: InputDecoration(labelText: 'Enter category title'),
                       controller: nameController,
                       // The validator receives the text that the user has entered.
                       validator: (value) {
@@ -112,20 +108,27 @@ class _PersonScreenState extends State<PersonScreen> {
                       },
                     ),
                   ),
-                  Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: ColorFormField(
-                        onChanged: (color) => (colourController = color),
-                        // Black by default, there's probably a better way to do this
-                        intialColor: colourController == null
-                            ? Colors.black
-                            : colourController,
-                      )),
+                  Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: ColorFormField(
+                      onChanged: (color) => colourController = color,
+                      // Black by default, there's probably a better way to do this
+                      initialColor: colourController == null ? Colors.black : colourController,
+                    ),
+                  ),
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                          child: Text(
+                            "Discard",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                         RaisedButton(
                           child: Text(
                             "Save",
@@ -133,29 +136,17 @@ class _PersonScreenState extends State<PersonScreen> {
                           ),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
-                            print(colourController);
                             if (_formKey.currentState.validate()) {
                               item = Datablock(
-                                  name: nameController.text,
-                                  colourValue: colourController.value);
+                                name: "${nameController.text[0].toUpperCase()}${nameController.text.substring(1)}",
+                                colourValue: colourController.value,
+                              );
 
-                              _formKey.currentState
-                                  .save(); // what does this do?
+                              _formKey.currentState.save(); // what does this do?
 
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
+                              Navigator.of(context, rootNavigator: true).pop();
                             }
                           },
-                        ),
-                        RaisedButton(
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () =>
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog'),
-                          child: Text(
-                            "Discard",
-                            style: TextStyle(color: Colors.white),
-                          ),
                         ),
                       ],
                     ),
