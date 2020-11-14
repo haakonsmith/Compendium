@@ -19,7 +19,7 @@ class _ColorFormFieldState extends State<ColorFormField> {
 
     return InkWell(
       onTap: () {
-        getColor(context: context, initialColor: widget.initialColor).then((value) {
+        getColor(context: context, initialColor: colorController).then((value) {
           widget.onChanged(value);
           setState(() => colorController = value);
         });
@@ -38,7 +38,8 @@ class _ColorFormFieldState extends State<ColorFormField> {
     );
   }
 
-  static Future<Color> getColor({@required BuildContext context, @required Color initialColor}) async {
+  static Future<Color> getColor(
+      {@required BuildContext context, @required Color initialColor}) async {
     Color colorController = initialColor;
 
     await showDialog(
@@ -77,7 +78,8 @@ class _ColorFormFieldState extends State<ColorFormField> {
                       style: TextStyle(color: Colors.white),
                     ),
                     color: Theme.of(context).primaryColor,
-                    onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                    onPressed: () => Navigator.of(context, rootNavigator: true)
+                        .pop('dialog'),
                   ),
                 ],
               )

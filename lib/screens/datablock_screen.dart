@@ -2,6 +2,7 @@ import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/theme.dart';
 import 'package:compendium/widgets/attributes.dart';
+import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/material.dart';
 
 class DatablockScreen extends StatefulWidget {
@@ -19,15 +20,18 @@ class _DatablockScreenState extends State<DatablockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    datablock = PersonBloc.of(context).activePersonBox.getAt(widget.datablockIndex);
+    datablock =
+        PersonBloc.of(context).activePersonBox.getAt(widget.datablockIndex);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PillAppBar(
         title: Text(datablock.name),
         backgroundColor: Color(datablock.colourValue),
       ),
       body: Container(
-        child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock),
+        child: PersonBloc.of(context).loading
+            ? CompendiumThemeData.of(context).dataLoadingIndicator
+            : _buildListView(context, datablock),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color(datablock.colourValue),

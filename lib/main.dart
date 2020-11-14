@@ -16,7 +16,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:compendium/data/person.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/scheduler.dart' show timeDilation;
+
 void main() async {
+  // For debug purposes
+  // timeDilation = 10.0;
   await Hive.initFlutter("hiveData");
 
   Hive.registerAdapter(DatablockAdapter());
@@ -27,7 +31,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<CompendiumThemeData>(create: (_) => CompendiumThemeData()),
+        ChangeNotifierProvider<CompendiumThemeData>(
+            create: (_) => CompendiumThemeData()),
         ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
         ChangeNotifierProvider<SettingsBloc>(create: (_) => SettingsBloc()),
       ],
@@ -39,7 +44,8 @@ void main() async {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    CompendiumThemeData.of(context).isDark = SettingsBloc.of(context, listen: true).darkTheme;
+    CompendiumThemeData.of(context).isDark =
+        SettingsBloc.of(context, listen: true).darkTheme;
 
     return MaterialApp(
         theme: CompendiumThemeData.of(context).materialTheme,

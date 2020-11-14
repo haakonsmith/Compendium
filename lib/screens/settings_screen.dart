@@ -1,9 +1,8 @@
 import 'package:compendium/data/BLoC/settings_bloc.dart';
 import 'package:compendium/theme.dart';
 import 'package:compendium/widgets/nav_drawer.dart';
+import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   static String routeName = '/settings';
@@ -20,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     settingsBloc = SettingsBloc.of(context, listen: true);
 
     return Scaffold(
-        appBar: AppBar(title: Text("Settings")),
+        appBar: PillAppBar(title: Text("Settings")),
         drawer: NavDrawer(),
         body: Container(
           child: settingsBloc.loading

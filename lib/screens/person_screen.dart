@@ -6,6 +6,7 @@ import 'package:compendium/vendor/color_picker.dart';
 import 'package:compendium/widgets/attributes.dart';
 import 'package:compendium/widgets/color_form_field.dart';
 import 'package:compendium/widgets/nav_drawer.dart';
+import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
@@ -31,7 +32,7 @@ class _PersonScreenState extends State<PersonScreen> {
     personBloc = PersonBloc.of(context, listen: true);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PillAppBar(
         title: Text(personBloc.activePerson.firstName),
       ),
       // drawer: NavDrawer(),
@@ -86,7 +87,8 @@ class _PersonScreenState extends State<PersonScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
             title: Text('Add Category'),
             content: Form(
               key: _formKey,
@@ -97,7 +99,8 @@ class _PersonScreenState extends State<PersonScreen> {
                     padding: EdgeInsets.all(8.0),
                     child: TextFormField(
                       cursorColor: Theme.of(context).primaryColor,
-                      decoration: InputDecoration(labelText: 'Enter category title'),
+                      decoration:
+                          InputDecoration(labelText: 'Enter category title'),
                       controller: nameController,
                       // The validator receives the text that the user has entered.
                       validator: (value) {
@@ -113,7 +116,9 @@ class _PersonScreenState extends State<PersonScreen> {
                     child: ColorFormField(
                       onChanged: (color) => colourController = color,
                       // Black by default, there's probably a better way to do this
-                      initialColor: colourController == null ? Colors.black : colourController,
+                      initialColor: (colourController == null)
+                          ? colourController
+                          : colourController,
                     ),
                   ),
                   Padding(
@@ -123,7 +128,9 @@ class _PersonScreenState extends State<PersonScreen> {
                       children: [
                         RaisedButton(
                           color: Theme.of(context).primaryColor,
-                          onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop('dialog'),
                           child: Text(
                             "Discard",
                             style: TextStyle(color: Colors.white),
@@ -138,11 +145,13 @@ class _PersonScreenState extends State<PersonScreen> {
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               item = Datablock(
-                                name: "${nameController.text[0].toUpperCase()}${nameController.text.substring(1)}",
+                                name:
+                                    "${nameController.text[0].toUpperCase()}${nameController.text.substring(1)}",
                                 colourValue: colourController.value,
                               );
 
-                              _formKey.currentState.save(); // what does this do?
+                              _formKey.currentState
+                                  .save(); // what does this do?
 
                               Navigator.of(context, rootNavigator: true).pop();
                             }
