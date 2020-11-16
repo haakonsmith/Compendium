@@ -11,6 +11,9 @@ class Person {
   @HiveField(1)
   String lastName;
 
+  /// This Field is the datablock index as a string. That is the difference between index and id
+  /// This works as an id because the index always changes, but that is fine because the change updates everything...
+  /// Plus the index is always unique within the box
   @HiveField(2)
   String databoxID;
 

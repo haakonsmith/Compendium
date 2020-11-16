@@ -8,9 +8,13 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 // It's a change notifier because while it's loading data
+// This tracks the active person, and the active datablock
 class PersonBloc extends ChangeNotifier {
   // This is the active person, basically the person that will be shown on the person screen
   Person _activePerson;
+
+  Datablock _activeDatablock;
+  int _activeDatablockIndex;
 
   Box<Datablock> _activePersonBox;
 
@@ -38,6 +42,15 @@ class PersonBloc extends ChangeNotifier {
     setActivePerson(Hive.box<Person>("people").getAt(personIndex));
   }
 
+  void setActiveDatablockFromIndex(int index) {
+    _activeDatablockIndex = index;
+    _activeDatablock = _activePersonBox.getAt(index);
+  }
+
+  void addAttributeToActiveDatablock() {}
+
+  Datablock get activeDatablock => _activeDatablock;
+
   bool get loading => _updating;
 
   Person get activePerson {
@@ -60,8 +73,25 @@ class PersonBloc extends ChangeNotifier {
     _activePersonBox.add(datablock);
   }
 
+  void updateActiveDatablock(Datablock datablock) {
+    _activePersonBox.putAt(_activeDatablockIndex, datablock);
+  }
+
   void addPerson(Person person) {
     Hive.box<Person>("people").add(person);
+  }
+
+  void deleteDatablockAtIndex(int index) {
+    _activePersonBox.deleteAt(index);
+  }
+
+  Future<void> deletePersonAtIndex(int index) async {
+    var person = Hive.box<Person>("people").getAt(index);
+
+    var databox = await Hive.openBox<Datablock>(person.databoxID);
+
+    databox.deleteFromDisk();
+    Hive.box<Person>("people").deleteAt(index);
   }
 
   static PersonBloc of(BuildContext context, {listen: false}) {

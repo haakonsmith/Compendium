@@ -11,7 +11,6 @@ class Attribute extends StatelessWidget {
     this.name,
     this.value,
     this.icon,
-    this.datablockIndex,
     this.onChange,
   });
 
@@ -25,21 +24,15 @@ class Attribute extends StatelessWidget {
   /// The icon to be displayed before the name of the attribute
   final Icon icon;
 
-  /// The index of the data block this attribute is attached to
-  @required
-  final int datablockIndex;
-
   /// This fires off whenever the user adds a new attribute or finishes an edit.
   final void Function() onChange;
 
   /// Creates a new [Attribute] and immediately calls editData() to bring up the dialog
   static Attribute fromDialog(
-    BuildContext context,
-    int datablockIndex, {
+    BuildContext context, {
     void Function() onChange,
   }) {
-    Attribute newAttribute =
-        Attribute(datablockIndex: datablockIndex, onChange: onChange);
+    Attribute newAttribute = Attribute(onChange: onChange);
     newAttribute.editData(context);
     return newAttribute;
   }
@@ -57,11 +50,7 @@ class Attribute extends StatelessWidget {
     if (name != null) attributeController.text = name;
     if (value != null) valueController.text = value;
 
-    Datablock datablock;
-
-    if (datablockBox.length > datablockIndex) {
-      datablock = datablockBox.getAt(datablockIndex);
-    }
+    Datablock datablock = PersonBloc.of(context).activeDatablock;
 
     // if we don't have a datablock, leave
     if (datablock == null) return;
@@ -124,8 +113,8 @@ class Attribute extends StatelessWidget {
                                     datablock.attributes
                                         .remove(attributeController.text);
 
-                                    datablockBox.putAt(
-                                        datablockIndex, datablock);
+                                    PersonBloc.of(context)
+                                        .updateActiveDatablock(datablock);
                                     Navigator.of(context, rootNavigator: true)
                                         .pop('dialog');
 
@@ -150,7 +139,8 @@ class Attribute extends StatelessWidget {
                               datablock.attributes[attributeController.text] =
                                   valueController.text;
 
-                              datablockBox.putAt(datablockIndex, datablock);
+                              PersonBloc.of(context)
+                                  .updateActiveDatablock(datablock);
                               Navigator.of(context, rootNavigator: true)
                                   .pop('dialog');
 

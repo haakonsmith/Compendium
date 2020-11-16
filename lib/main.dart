@@ -76,10 +76,10 @@ class CompendiumApp extends StatelessWidget {
             if (PersonBloc.of(context).activePerson == null) {
               return MaterialPageRoute(builder: (context) => IndexScreen());
             }
+            PersonBloc.of(context)
+                .setActiveDatablockFromIndex(int.parse(uriSegments[1]));
             return NestedPageRoute(
-              builder: (context) => DatablockScreen(
-                datablockIndex: int.parse(uriSegments[1]),
-              ),
+              builder: (context) => DatablockScreen(),
             );
           }
 

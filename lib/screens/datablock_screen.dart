@@ -6,10 +6,9 @@ import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/material.dart';
 
 class DatablockScreen extends StatefulWidget {
-  DatablockScreen({Key key, this.datablockIndex}) : super(key: key);
+  DatablockScreen({Key key}) : super(key: key);
 
   static final String routeName = '/datablock';
-  final int datablockIndex;
 
   @override
   State<StatefulWidget> createState() => _DatablockScreenState();
@@ -20,8 +19,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    datablock =
-        PersonBloc.of(context).activePersonBox.getAt(widget.datablockIndex);
+    datablock = PersonBloc.of(context).activeDatablock;
 
     return Scaffold(
       appBar: PillAppBar(
@@ -40,7 +38,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
         // so I'm just doing this to avoid copy-pasting the dialog code here too
         onPressed: () => Attribute.fromDialog(
           context,
-          widget.datablockIndex,
           onChange: () => setState(() {}),
         ),
       ),
@@ -64,7 +61,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
         return Attribute(
           name: attribute.key,
           value: attribute.value,
-          datablockIndex: widget.datablockIndex,
           onChange: () => setState(() {}),
         );
       },

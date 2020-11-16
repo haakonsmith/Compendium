@@ -83,21 +83,11 @@ class _IndexScreenState extends State<IndexScreen> {
                             ),
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
-                              if (Hive.isBoxOpen(person.databoxID)) {
-                                Hive.box<Datablock>(person.databoxID)
-                                    .deleteFromDisk();
-                                Hive.box<Person>('people').deleteAt(index);
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                              } else {
-                                Hive.openBox<Datablock>(person.databoxID)
-                                    .then((databox) {
-                                  databox.deleteFromDisk();
-                                  Hive.box<Person>('people').deleteAt(index);
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
-                                });
-                              }
+                              PersonBloc.of(context)
+                                  .deletePersonAtIndex(index)
+                                  .then((_) =>
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop());
                             },
                           ),
                         ],
