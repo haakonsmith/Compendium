@@ -33,8 +33,7 @@ class _IndexScreenState extends State<IndexScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            getNewPerson(context).then((value) => personBloc.addPerson(value)),
+        onPressed: () => getNewPerson(context).then((value) => personBloc.addPerson(value)),
         child: Icon(Icons.add),
       ),
     );
@@ -59,8 +58,7 @@ class _IndexScreenState extends State<IndexScreen> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                       title: Text('Are you sure?'),
                       content: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -72,8 +70,7 @@ class _IndexScreenState extends State<IndexScreen> {
                             ),
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
                             },
                           ),
                           RaisedButton(
@@ -84,18 +81,14 @@ class _IndexScreenState extends State<IndexScreen> {
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
                               if (Hive.isBoxOpen(person.databoxID)) {
-                                Hive.box<Datablock>(person.databoxID)
-                                    .deleteFromDisk();
+                                Hive.box<Datablock>(person.databoxID).deleteFromDisk();
                                 Hive.box<Person>('people').deleteAt(index);
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
+                                Navigator.of(context, rootNavigator: true).pop();
                               } else {
-                                Hive.openBox<Datablock>(person.databoxID)
-                                    .then((databox) {
+                                Hive.openBox<Datablock>(person.databoxID).then((databox) {
                                   databox.deleteFromDisk();
                                   Hive.box<Person>('people').deleteAt(index);
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
+                                  Navigator.of(context, rootNavigator: true).pop();
                                 });
                               }
                             },
@@ -111,10 +104,7 @@ class _IndexScreenState extends State<IndexScreen> {
           onTap: () => Navigator.of(context).pushNamed("/person/$index"),
         );
       },
-      separatorBuilder: (context, index) => Divider(
-          height: 20,
-          indent: MediaQuery.of(context).size.width * 0.05,
-          endIndent: MediaQuery.of(context).size.width * 0.05),
+      separatorBuilder: (context, index) => Divider(height: 20, indent: MediaQuery.of(context).size.width * 0.05, endIndent: MediaQuery.of(context).size.width * 0.05),
     );
   }
 }
@@ -132,8 +122,7 @@ Future<Person> getNewPerson(BuildContext context) async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           title: Text('Add person'),
           content: Form(
             key: _formKey,
@@ -173,9 +162,7 @@ Future<Person> getNewPerson(BuildContext context) async {
                     children: [
                       RaisedButton(
                         color: Theme.of(context).primaryColor,
-                        onPressed: () =>
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('dialog'),
+                        onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
                         child: Text(
                           "Discard",
                           style: TextStyle(color: Colors.white),
@@ -190,16 +177,13 @@ Future<Person> getNewPerson(BuildContext context) async {
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
                             // this ensures that even if two people have the same name, the databox id will be different
-                            String databoxID =
-                                "${firstnameController.text}-${lastnameController.text}";
+                            String databoxID = "${firstnameController.text}-${lastnameController.text}";
                             int idOffset = 0;
-                            bool idExists = box.values.any((person) =>
-                                person.databoxID == "$databoxID-$idOffset");
+                            bool idExists = box.values.any((person) => person.databoxID == "$databoxID-$idOffset");
 
                             while (idExists) {
                               idOffset++;
-                              idExists = box.values.any((person) =>
-                                  person.databoxID == "$databoxID-$idOffset");
+                              idExists = box.values.any((person) => person.databoxID == "$databoxID-$idOffset");
                             }
 
                             databoxID = "$databoxID-$idOffset";
@@ -212,10 +196,8 @@ Future<Person> getNewPerson(BuildContext context) async {
                               databoxID: databoxID,
                             );
 
-                            item.firstName =
-                                "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
-                            item.lastName =
-                                "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
+                            item.firstName = "${item.firstName[0].toUpperCase()}${item.firstName.substring(1)}";
+                            item.lastName = "${item.lastName[0].toUpperCase()}${item.lastName.substring(1)}";
 
                             // Keep form state incase user wants to go back to form
                             _formKey.currentState.save();

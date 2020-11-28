@@ -20,8 +20,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    datablock =
-        PersonBloc.of(context).activePersonBox.getAt(widget.datablockIndex);
+    datablock = PersonBloc.of(context).activePersonBox.getAt(widget.datablockIndex);
 
     return Scaffold(
       appBar: PillAppBar(
@@ -29,9 +28,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
         backgroundColor: Color(datablock.colourValue),
       ),
       body: Container(
-        child: PersonBloc.of(context).loading
-            ? CompendiumThemeData.of(context).dataLoadingIndicator
-            : _buildListView(context, datablock),
+        child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color(datablock.colourValue),
