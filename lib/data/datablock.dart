@@ -19,7 +19,11 @@ class Datablock {
   int colourValue;
 
   @HiveField(2)
+<<<<<<< Updated upstream
   List<Datablock> children = List<Datablock>();
+=======
+  List<Datablock> children = List();
+>>>>>>> Stashed changes
 
   @HiveField(3)
   String value;
@@ -30,8 +34,14 @@ class Datablock {
     @required this.value,
   });
 
+<<<<<<< Updated upstream
   Map toJson() =>
       {"name": name, "children": children.map((c) => c.toJson()).toList()};
+=======
+  static Datablock blank() {
+    return Datablock(name: "", colourValue: Colors.black.value);
+  }
+>>>>>>> Stashed changes
 
   Widget buildPreview(BuildContext context, int datablockId) {
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.

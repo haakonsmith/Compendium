@@ -1,0 +1,25 @@
+[
+    {
+        "name": "Medical Profile",
+        "colorValue": 69420,
+        "attributes": {
+            "age": 69
+        }
+    },
+    {
+        "name": "Event Significance Log",
+        "colorValue": 666,
+        "attributes": {
+            "EventName or Id": {
+                
+            }
+        }
+    },
+    { // this boi
+        "name": "Single Event",
+        "colorValue": 666,
+        "attributes": {
+            "EventName or Id": 2// Here we put the id of another datablock
+        }
+    }
+]

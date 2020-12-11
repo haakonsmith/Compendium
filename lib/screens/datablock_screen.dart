@@ -24,11 +24,15 @@ class _DatablockScreenState extends State<DatablockScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
     datablock = Datablock(
         name: "Root list", colourValue: Theme.of(context).primaryColor.value);
 
     datablock.children = PersonBloc.of(context, listen: true).activeDatalist;
     // print(datablock.children);
+=======
+    datablock = PersonBloc.of(context).activeDatablock;
+>>>>>>> Stashed changes
 
     return Scaffold(
       appBar: PillAppBar(
@@ -45,11 +49,16 @@ class _DatablockScreenState extends State<DatablockScreen> {
             : _buildListView(context, datablock.children),
       ),
       floatingActionButton: FloatingActionButton(
+<<<<<<< Updated upstream
           // backgroundColor: Color(datablock.colourValue),
+=======
+          backgroundColor: Color(datablock.colourValue),
+>>>>>>> Stashed changes
           child: Icon(Icons.add),
           // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
           // so I'm just doing this to avoid copy-pasting the dialog code here too
           onPressed: () => setState(() => PersonBloc.of(context)
+<<<<<<< Updated upstream
               .addDatablockToActive(Datablock(
                   colourValue: Colors.black.value,
                   name: "test",
@@ -82,6 +91,36 @@ class _DatablockScreenState extends State<DatablockScreen> {
                 Text(child.value),
               ],
             ));
+=======
+              .addDatablockToActiveDatablock(
+                  Attribute.fromDialog(context).datablock))),
+    );
+  }
+
+  Widget _buildListView(BuildContext context, Datablock datablock) {
+    if (datablock.children == null || datablock.children.length == 0) {
+      return Center(
+        child: Text(
+          'No data here :)\nTry adding some with the add button\nin the bottom right corner.',
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: datablock.children.length,
+      itemBuilder: (context, index) {
+        var attribute = Attribute(
+            onChange: () => setState(() => {}),
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                  ModalRoute.of(context).settings.name +
+                      "/datablock/" +
+                      index.toString());
+            },
+            datablock: datablock.children.elementAt(index));
+        return attribute.build(context);
+>>>>>>> Stashed changes
       },
     );
     // return Text("test");

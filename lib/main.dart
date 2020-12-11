@@ -16,7 +16,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:compendium/data/person.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter/scheduler.dart' show timeDilation;
+// For debug purposes
+// import 'package:flutter/scheduler.dart' show timeDilation;
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -73,11 +74,32 @@ class CompendiumApp extends StatelessWidget {
 
             PersonBloc.of(context).setActivePersonFromIndex(personIndex);
 
+<<<<<<< Updated upstream
             return NestedPageRoute(
                 builder: (context) => DatablockScreen(
                     // datalistfuture:
                     //     PersonBloc.of(context).listenToDatablockBox(),
                     ));
+=======
+            return NestedPageRoute(
+                settings: settings, builder: (context) => PersonScreen());
+          }
+
+          if (uriSegments.first == 'datablock' && uriSegments.length >= 2) {
+            if (PersonBloc.of(context).activePerson == null) {
+              return MaterialPageRoute(
+                  settings: settings, builder: (context) => IndexScreen());
+            }
+            PersonBloc.of(context).activeDatablock =
+                PersonBloc.of(context).datablockOfRoute(uriSegments);
+
+            return NestedPageRoute(
+              settings: settings,
+              builder: (context) => DatablockScreen(
+                datablockIndex: int.parse(uriSegments[1]),
+              ),
+            );
+>>>>>>> Stashed changes
           }
 
           // if (uriSegments.first == 'datablock' && uriSegments.length == 2) {

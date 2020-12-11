@@ -25,9 +25,13 @@ class PersonBloc extends ChangeNotifier {
   Person _activePerson;
 
   Box<Datablock> _activePersonBox;
+<<<<<<< Updated upstream
   ActiveDataList _activeDatalist = ActiveDataList();
 
   List<int> _path = List<int>();
+=======
+  Datablock activeDatablock;
+>>>>>>> Stashed changes
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
@@ -42,8 +46,12 @@ class PersonBloc extends ChangeNotifier {
     }
 
     _activePerson = person;
+<<<<<<< Updated upstream
     // print(_activePerson);
     // print(_activePerson.databoxID);
+=======
+
+>>>>>>> Stashed changes
     _activePersonBox = await Hive.openBox<Datablock>(_activePerson.databoxID);
     _updating = false;
     _activeDatalist.isRoot = true;
@@ -159,11 +167,43 @@ class PersonBloc extends ChangeNotifier {
   }
 
   void addDatablockToActivePerson(Datablock datablock) {
+    // if (findDatablockRegex.hasMatch(name)) {
+    //   var uriSegments =
+    //       Uri.parse(ModalRoute.of(context).settings.name).pathSegments;
+    //   dynamic val = PersonBloc.of(context).activePersonBox;
+
+    //   var i = 0;
+
+    //   for (; i < uriSegments.length; i += 2) {
+    //     val = PersonBloc.of(context)
+    //         .activePersonBox
+    //         .getAt(int.parse(uriSegments[i]));
+    //   }
+
+    //   return val.buildPreview(uriSegments[i]);
+    // }
+
+    // if (uriSegments.first ==)
     _activePersonBox.add(datablock);
+  }
+
+  void addDatablockToActiveDatablock(Datablock datablock) {
+    activeDatablock.children.add(datablock);
   }
 
   void addPerson(Person person) {
     Hive.box<Person>("people").add(person);
+  }
+
+  Datablock datablockOfRoute(List<String> uriSegments) {
+    Datablock active = _activePersonBox.getAt(int.parse(uriSegments[1]));
+
+    int i = 3;
+    for (; i < uriSegments.length; i += 2) {
+      active = active.children[int.parse(uriSegments[i])];
+    }
+
+    return active;
   }
 
   static PersonBloc of(BuildContext context, {listen: false}) {
