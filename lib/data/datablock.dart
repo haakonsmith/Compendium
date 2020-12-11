@@ -19,12 +19,19 @@ class Datablock {
   int colourValue;
 
   @HiveField(2)
-  Map<String, String> attributes;
+  List<Datablock> children = List<Datablock>();
+
+  @HiveField(3)
+  String value;
 
   Datablock({
     @required this.name,
     @required this.colourValue,
+    @required this.value,
   });
+
+  Map toJson() =>
+      {"name": name, "children": children.map((c) => c.toJson()).toList()};
 
   Widget buildPreview(BuildContext context, int datablockId) {
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
@@ -38,10 +45,12 @@ class Datablock {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
-          onTap: () => Navigator.of(context).pushNamed("/datablock/$datablockId"),
+          onTap: () =>
+              Navigator.of(context).pushNamed("/datablock/$datablockId"),
           child: Container(
             decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: Color(colourValue), width: 15)),
+              border: Border(
+                  left: BorderSide(color: Color(colourValue), width: 15)),
             ),
             padding: EdgeInsets.all(20),
             alignment: Alignment.centerLeft,
@@ -62,7 +71,8 @@ class Datablock {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0)),
                           title: Text('Are you sure?'),
                           content: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -74,7 +84,8 @@ class Datablock {
                                 ),
                                 color: Theme.of(context).primaryColor,
                                 onPressed: () {
-                                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop('dialog');
                                 },
                               ),
                               RaisedButton(
@@ -84,8 +95,11 @@ class Datablock {
                                 ),
                                 color: Theme.of(context).primaryColor,
                                 onPressed: () {
-                                  PersonBloc.of(context).activePersonBox.deleteAt(datablockId);
-                                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                                  PersonBloc.of(context)
+                                      .activePersonBox
+                                      .deleteAt(datablockId);
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop('dialog');
                                 },
                               ),
                             ],

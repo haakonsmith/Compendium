@@ -5,10 +5,10 @@ import 'package:compendium/routers/instant_page_route.dart';
 import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/screens/datablock_screen.dart';
 import 'package:compendium/screens/index_screen.dart';
-import 'package:compendium/screens/person_screen.dart';
 import 'package:compendium/screens/settings_screen.dart';
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -17,6 +17,10 @@ import 'package:compendium/data/person.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/scheduler.dart' show timeDilation;
+
+var logger = Logger(
+  printer: PrettyPrinter(),
+);
 
 void main() async {
   // For debug purposes
@@ -69,19 +73,23 @@ class CompendiumApp extends StatelessWidget {
 
             PersonBloc.of(context).setActivePersonFromIndex(personIndex);
 
-            return NestedPageRoute(builder: (context) => PersonScreen());
+            return NestedPageRoute(
+                builder: (context) => DatablockScreen(
+                    // datalistfuture:
+                    //     PersonBloc.of(context).listenToDatablockBox(),
+                    ));
           }
 
-          if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
-            if (PersonBloc.of(context).activePerson == null) {
-              return MaterialPageRoute(builder: (context) => IndexScreen());
-            }
-            return NestedPageRoute(
-              builder: (context) => DatablockScreen(
-                datablockIndex: int.parse(uriSegments[1]),
-              ),
-            );
-          }
+          // if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
+          //   if (PersonBloc.of(context).activePerson == null) {
+          //     return MaterialPageRoute(builder: (context) => IndexScreen());
+          //   }
+          //   return NestedPageRoute(
+          //     builder: (context) => DatablockScreen(
+          //       datablockIndex: int.parse(uriSegments[1]),
+          //     ),
+          //   );
+          // }
 
           // index should be the default
           return InstantPageRoute(builder: (context) => IndexScreen());

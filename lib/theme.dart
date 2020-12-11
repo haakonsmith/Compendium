@@ -45,10 +45,11 @@ class CompendiumThemeData extends ChangeNotifier {
 
   final BorderRadius borderRadius = BorderRadius.circular(20);
 
-  Widget get dataLoadingIndicator => CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(
+  Widget get dataLoadingIndicator => Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
         materialTheme.primaryColor,
-      ));
+      )));
   // White if it's darktheme, else just leave it.
   ListTileTheme listTileTheme({Widget child}) => ListTileTheme(
         iconColor: isDark ? Colors.white : null,

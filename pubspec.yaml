@@ -37,6 +37,8 @@ dev_dependencies:
     sdk: flutter
   hive_generator: 
   build_runner: 
+  logger: 
+  logger_flutter:
   
 
 

@@ -19,19 +19,23 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
     return Datablock(
       name: fields[0] as String,
       colourValue: fields[1] as int,
-    )..attributes = (fields[2] as Map)?.cast<String, String>();
+    )
+      ..children = (fields[2] as List)?.cast<Datablock>()
+      ..value = fields[3] as String;
   }
 
   @override
   void write(BinaryWriter writer, Datablock obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
       ..write(obj.colourValue)
       ..writeByte(2)
-      ..write(obj.attributes);
+      ..write(obj.children)
+      ..writeByte(3)
+      ..write(obj.value);
   }
 
   @override
