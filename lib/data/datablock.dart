@@ -19,21 +19,22 @@ class Datablock {
   int colourValue;
 
   @HiveField(2)
-  List<Datablock> children = List();
+  List<Datablock> children = <Datablock>[];
 
   @HiveField(3)
   String value;
 
-  Datablock({
-    @required this.name,
-    @required this.colourValue,
-    @required this.value,
-  });
+  Datablock(this.name, this.value,
+      {this.colourValue = CompendiumThemeData.blueBlackPrimaryValue, children})
+      // https://stackoverflow.com/questions/54279223/flutter-default-assignment-of-list-parameter-in-a-constructor
+      // Otherwise null errors appear
+      : children = children ?? <Datablock>[];
+
   String toString() =>
       "name: " +
       name +
       " colourValue: " +
-      colourValue.toString() +
+      Color(colourValue).toString() +
       " value: " +
       value +
       " children?: " +
@@ -44,15 +45,14 @@ class Datablock {
 
   /// Performs a deep copy of the object
   Datablock copy() {
-    var newDatablock =
-        Datablock(name: name, colourValue: colourValue, value: value);
+    var newDatablock = Datablock(name, value, colourValue: colourValue);
+    print(children.toString());
     newDatablock.children = children.toList();
     return newDatablock;
   }
 
   static Datablock blank() {
-    return Datablock(
-        name: "", colourValue: Colors.black.value, value: "Nothing");
+    return Datablock("", "Nothing", colourValue: Colors.black.value);
   }
 
   Widget buildPreview(BuildContext context, int datablockId) {

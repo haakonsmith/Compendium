@@ -17,11 +17,11 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Datablock(
-      name: fields[0] as String,
+      fields[0] as String,
+      fields[3] as String,
       colourValue: fields[1] as int,
-    )
-      ..children = (fields[2] as List)?.cast<Datablock>()
-      ..value = fields[3] as String;
+      children: (fields[2] as List)?.cast<Datablock>(),
+    );
   }
 
   @override

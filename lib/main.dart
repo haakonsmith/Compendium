@@ -72,7 +72,11 @@ class CompendiumApp extends StatelessWidget {
           if (uriSegments.first == 'person' && uriSegments.length == 2) {
             var personIndex = int.parse(uriSegments[1]);
 
-            PersonBloc.of(context).setActivePersonFromIndex(personIndex);
+            // Set the colour using this... Because otherwise weird stuff
+            PersonBloc.of(context).setActivePersonFromIndex(personIndex,
+                color: CompendiumThemeData.of(context, listen: false)
+                    .materialTheme
+                    .primaryColor);
 
             return NestedPageRoute(
                 builder: (context) => DatablockScreen(

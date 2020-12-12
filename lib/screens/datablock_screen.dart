@@ -24,20 +24,22 @@ class _DatablockScreenState extends State<DatablockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    datablock = Datablock(
-        name: "Root list", colourValue: Theme.of(context).primaryColor.value);
-
     // Good sir please rebuild widget when this changes  \/
-    datablock.children = PersonBloc.of(context, listen: true).activeData;
+    datablock = PersonBloc.of(context, listen: true).activeDatablock ??
+        Datablock("Loading...", "",
+            colourValue: Theme.of(context).primaryColor.value);
+
+    print(datablock.toString());
+    print(Theme.of(context).primaryColor);
 
     return Scaffold(
       appBar: PillAppBar(
-        title: Text("test"),
+        title: Text(datablock.name),
         onBackButtonPressed: () {
           PersonBloc.of(context).popNesting();
           Navigator.of(context).pop();
         },
-        // backgroundColor: Color(datablock.colourValue),
+        backgroundColor: Color(datablock.colourValue),
       ),
       body: Container(
         child: PersonBloc.of(context).loading
@@ -49,8 +51,9 @@ class _DatablockScreenState extends State<DatablockScreen> {
           child: Icon(Icons.add),
           // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
           // so I'm just doing this to avoid copy-pasting the dialog code here too
-          onPressed: () => setState(() =>
-              PersonBloc.of(context).addDatablockToActive(Datablock.blank()))),
+          onPressed: () => setState(() {
+                PersonBloc.of(context).addDatablockToActive(Datablock.blank());
+              })),
     );
   }
 
@@ -68,17 +71,26 @@ class _DatablockScreenState extends State<DatablockScreen> {
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
           var child = datablocks.elementAt(index);
-          return InkWell(
+          var attribute = Attribute(
+              onChange: () => setState(() => {}),
               onTap: () {
                 PersonBloc.of(context).nestFurther(index);
                 Navigator.of(context).push(
                     NestedPageRoute(builder: (context) => DatablockScreen()));
               },
-              child: Row(
-                children: [
-                  Text(child.value),
-                ],
-              ));
+              datablock: datablock.children.elementAt(index));
+          return attribute.build(context);
+          // return InkWell(
+          //     onTap: () {
+          //       PersonBloc.of(context).nestFurther(index);
+          //       Navigator.of(context).push(
+          //           NestedPageRoute(builder: (context) => DatablockScreen()));
+          //     },
+          //     child: Row(
+          //       children: [
+          //         Text(child.value),
+          //       ],
+          //     ));
           // .addDatablockToActiveDatablock(
           //     Attribute.fromDialog(context).datablock)),
         });

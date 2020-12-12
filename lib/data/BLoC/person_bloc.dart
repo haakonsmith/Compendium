@@ -15,9 +15,8 @@ var logger = Logger(
 
 /// This is just a neat dataclass to wrap all the attributes in
 class ActiveData {
-  // Instead of tracking the datablock, we track the datablock.children
-  // of the parent. I think
-  List<Datablock> parentChildren = List<Datablock>();
+  // active data list, this abstracts away the whole root box or simply a datablock children list
+  Datablock datablock;
 
   // This is important... But I forgot why
   // I think it's the rootNode index
@@ -39,14 +38,14 @@ class PersonBloc extends ChangeNotifier {
   Box<Datablock> _activePersonBox;
   ActiveData _activeData = ActiveData();
 
+  // This is path from the rootNode to the current _activeData.data
   List<int> _path = List<int>();
-  Datablock activeDatablock;
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
 
   // Create the box or open it
-  Future<void> setActivePerson(Person person) async {
+  Future<void> setActivePerson(Person person, {Color color}) async {
     _updating = true;
     if (_activePerson != null && Hive.isBoxOpen(_activePerson.databoxID)) {
       if (_activePerson.databoxID.isNotEmpty) {
@@ -59,13 +58,18 @@ class PersonBloc extends ChangeNotifier {
 
     _updating = false;
 
+    print("FROM set active person" + color.toString());
+
     _activeData.isRoot = true;
-    _activeData.parentChildren = _activePersonBox.values.toList();
+    _activeData.datablock = Datablock(
+        person.firstName + " " + person.lastName, "",
+        colourValue: color.value, children: _activePersonBox.values.toList());
     notifyListeners();
   }
 
-  Future<void> setActivePersonFromIndex(int personIndex) async {
-    setActivePerson(Hive.box<Person>("people").getAt(personIndex));
+  Future<void> setActivePersonFromIndex(int personIndex, {Color color}) async {
+    setActivePerson(Hive.box<Person>("people").getAt(personIndex),
+        color: color);
   }
 
   bool get loading => _updating;
@@ -82,10 +86,10 @@ class PersonBloc extends ChangeNotifier {
     return activePersonBox.values.toList();
   }
 
-  List<Datablock> get activeData {
+  Datablock get activeDatablock {
     if (_updating) return null;
 
-    return _activeData.parentChildren;
+    return _activeData.datablock;
   }
 
   Box<Datablock> get activePersonBox {
@@ -107,10 +111,11 @@ class PersonBloc extends ChangeNotifier {
 
   void addDatablockToActive(Datablock datablock) {
     if (_activeData.isRoot) {
+      _activeData.datablock.children.add(datablock);
       _activePersonBox.add(datablock);
     } else {
       /// This is here because, it would break my heart to remove it. Imagine going down a massive rabbit hole...
-      /// "Am I disabled?" 
+      /// "Am I disabled?"
       // Start the node search at the root node
       // The reason something like this ->
       // Datablock rootNode = _activePersonBox.values.toList()[_path.first]
@@ -128,7 +133,9 @@ class PersonBloc extends ChangeNotifier {
       // This is possibly because the ownership of the reference to this object
       // is not transfered to the List<Datablock>, and hence, gets deleted
       // But your guess is as good as mine
-      _activeData.parentChildren.add(datablock);
+      _activeData.datablock.children.add(datablock);
+      // print(_activeData.rootNode.toString());
+      // print(_activeData.rootNode.toJson());
 
       _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
     }
@@ -139,25 +146,31 @@ class PersonBloc extends ChangeNotifier {
 
     if (_activeData.isRoot) {
       // If it is root? We need to change to current root...
-      _activeData.rootNode = _activeData.parentChildren[index];
+      _activeData.rootNode = _activeData.datablock.children[index];
       // If we nest past root, it won't be root
       _activeData.isRoot = false;
     }
 
     _path.add(index);
 
-    _activeData.parentChildren = _activeData.parentChildren[index].children;
+    _activeData.datablock.colourValue =
+        _activeData.datablock.children[index].colourValue;
+    _activeData.datablock.name = _activeData.datablock.children[index].name;
+    _activeData.datablock.value = _activeData.datablock.children[index].value;
+    _activeData.datablock.children =
+        _activeData.datablock.children[index].children;
   }
 
   void popNesting() {
     if (_path.length != 0) {
       var finalIndex = _path.removeLast();
 
-      _activeData.parentChildren = _activePersonBox.values.toList();
+      _activeData.datablock.children = _activePersonBox.values.toList();
 
       // Traverse the path to get the futhest most item
       _path.forEach((index) {
-        _activeData.parentChildren = _activeData.parentChildren[index].children;
+        _activeData.datablock.children =
+            _activeData.datablock.children[index].children;
       });
 
       _activeData.isRoot = false;
@@ -165,9 +178,6 @@ class PersonBloc extends ChangeNotifier {
     } else {
       _activeData.isRoot = true;
     }
-
-    // logger.i(_path);
-    // _activeDatalist.datalist = _activeDatalist.datalist[index].children;
   }
 
   ValueListenable<Box<Datablock>> listenForDatablocks() {
@@ -175,28 +185,7 @@ class PersonBloc extends ChangeNotifier {
   }
 
   void addDatablockToActivePerson(Datablock datablock) {
-    // if (findDatablockRegex.hasMatch(name)) {
-    //   var uriSegments =
-    //       Uri.parse(ModalRoute.of(context).settings.name).pathSegments;
-    //   dynamic val = PersonBloc.of(context).activePersonBox;
-
-    //   var i = 0;
-
-    //   for (; i < uriSegments.length; i += 2) {
-    //     val = PersonBloc.of(context)
-    //         .activePersonBox
-    //         .getAt(int.parse(uriSegments[i]));
-    //   }
-
-    //   return val.buildPreview(uriSegments[i]);
-    // }
-
-    // if (uriSegments.first ==)
     _activePersonBox.add(datablock);
-  }
-
-  void addDatablockToActiveDatablock(Datablock datablock) {
-    activeDatablock.children.add(datablock);
   }
 
   void addPerson(Person person) {
