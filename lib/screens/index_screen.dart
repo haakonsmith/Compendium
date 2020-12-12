@@ -204,11 +204,8 @@ Future<Person> getNewPerson(BuildContext context) async {
 
                             databoxID = "$databoxID-$idOffset";
 
-<<<<<<< Updated upstream
                             // print(databoxID);
 
-=======
->>>>>>> Stashed changes
                             item = Person(
                               firstName: firstnameController.text,
                               lastName: lastnameController.text,

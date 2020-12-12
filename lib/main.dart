@@ -74,33 +74,30 @@ class CompendiumApp extends StatelessWidget {
 
             PersonBloc.of(context).setActivePersonFromIndex(personIndex);
 
-<<<<<<< Updated upstream
             return NestedPageRoute(
                 builder: (context) => DatablockScreen(
                     // datalistfuture:
                     //     PersonBloc.of(context).listenToDatablockBox(),
                     ));
-=======
-            return NestedPageRoute(
-                settings: settings, builder: (context) => PersonScreen());
+            // return NestedPageRoute(
+            //     settings: settings, builder: (context) => PersonScreen());
           }
 
-          if (uriSegments.first == 'datablock' && uriSegments.length >= 2) {
-            if (PersonBloc.of(context).activePerson == null) {
-              return MaterialPageRoute(
-                  settings: settings, builder: (context) => IndexScreen());
-            }
-            PersonBloc.of(context).activeDatablock =
-                PersonBloc.of(context).datablockOfRoute(uriSegments);
+          // if (uriSegments.first == 'datablock' && uriSegments.length >= 2) {
+          //   if (PersonBloc.of(context).activePerson == null) {
+          //     return MaterialPageRoute(
+          //         settings: settings, builder: (context) => IndexScreen());
+          //   }
+          //   PersonBloc.of(context).activeDatablock =
+          //       PersonBloc.of(context).datablockOfRoute(uriSegments);
 
-            return NestedPageRoute(
-              settings: settings,
-              builder: (context) => DatablockScreen(
-                datablockIndex: int.parse(uriSegments[1]),
-              ),
-            );
->>>>>>> Stashed changes
-          }
+          //   return NestedPageRoute(
+          //     settings: settings,
+          //     builder: (context) => DatablockScreen(
+          //       datablockIndex: int.parse(uriSegments[1]),
+          //     ),
+          //   );
+          // }
 
           // if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
           //   if (PersonBloc.of(context).activePerson == null) {

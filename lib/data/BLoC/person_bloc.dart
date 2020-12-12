@@ -13,10 +13,22 @@ var logger = Logger(
   printer: PrettyPrinter(),
 );
 
-class ActiveDataList {
-  List<Datablock> datalist = List<Datablock>();
-  int index = 0;
+/// This is just a neat dataclass to wrap all the attributes in
+class ActiveData {
+  // Instead of tracking the datablock, we track the datablock.children
+  // of the parent. I think
+  List<Datablock> parentChildren = List<Datablock>();
+
+  // This is important... But I forgot why
+  // I think it's the rootNode index
+  int rootNodeIndex = 0;
+
+  // If it's a root node we don't need to do the nesting stuff
+  // see references
   bool isRoot = true;
+
+  // Track the active rootnode
+  Datablock rootNode;
 }
 
 // It's a change notifier because while it's loading data
@@ -25,13 +37,10 @@ class PersonBloc extends ChangeNotifier {
   Person _activePerson;
 
   Box<Datablock> _activePersonBox;
-<<<<<<< Updated upstream
-  ActiveDataList _activeDatalist = ActiveDataList();
+  ActiveData _activeData = ActiveData();
 
   List<int> _path = List<int>();
-=======
   Datablock activeDatablock;
->>>>>>> Stashed changes
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
@@ -46,16 +55,12 @@ class PersonBloc extends ChangeNotifier {
     }
 
     _activePerson = person;
-<<<<<<< Updated upstream
-    // print(_activePerson);
-    // print(_activePerson.databoxID);
-=======
-
->>>>>>> Stashed changes
     _activePersonBox = await Hive.openBox<Datablock>(_activePerson.databoxID);
+
     _updating = false;
-    _activeDatalist.isRoot = true;
-    _activeDatalist.datalist = _activePersonBox.values.toList();
+
+    _activeData.isRoot = true;
+    _activeData.parentChildren = _activePersonBox.values.toList();
     notifyListeners();
   }
 
@@ -77,10 +82,10 @@ class PersonBloc extends ChangeNotifier {
     return activePersonBox.values.toList();
   }
 
-  List<Datablock> get activeDatalist {
+  List<Datablock> get activeData {
     if (_updating) return null;
 
-    return _activeDatalist.datalist;
+    return _activeData.parentChildren;
   }
 
   Box<Datablock> get activePersonBox {
@@ -89,73 +94,76 @@ class PersonBloc extends ChangeNotifier {
     return _activePersonBox;
   }
 
-  void addDatablockToActive(Datablock datablock) {
-    var getParent = () {
-      
+  Datablock getParentFromActive(List<int> path) {
+    var rootData = _activePersonBox.getAt(_path.first);
+    Datablock parent = rootData;
+
+    for (var i = 0; i < path.length; i++) {
+      parent = parent.children[path[i]];
     }
-    _activeDatalist.datalist.add(datablock);
 
-    var currentList = _activeDatalist.datalist;
+    return parent;
+  }
 
-    if (_activeDatalist.isRoot) {
+  void addDatablockToActive(Datablock datablock) {
+    if (_activeData.isRoot) {
       _activePersonBox.add(datablock);
     } else {
-      // The whole datablock needs to be rebuilt to put back into the database
-      var rootData = _activePersonBox.getAt(_activeDatalist.index);
+      /// This is here because, it would break my heart to remove it. Imagine going down a massive rabbit hole...
+      /// "Am I disabled?" 
+      // Start the node search at the root node
+      // The reason something like this ->
+      // Datablock rootNode = _activePersonBox.values.toList()[_path.first]
+      // is not used, is because well... I think that it might break the reference,
+      // but I'm not sure, for now this works
+      // Datablock newNode = _activeDatalist.rootNode;
 
-      // var finalIndex = _path.removeLast();
+      // // parentNode
+      // for (var i = 0; i < _path.length - 1; i++) {
+      //   newNode = newNode.children[_path[i]];
+      // }
 
-      logger.i(rootData.toJson());
+      // Now you may be thinking that this is stupid, however, if we do not,
+      // then Stack overflow gets mad.
+      // This is possibly because the ownership of the reference to this object
+      // is not transfered to the List<Datablock>, and hence, gets deleted
+      // But your guess is as good as mine
+      _activeData.parentChildren.add(datablock);
 
-      var newData = rootData;
-
-      var newPath = _path;
-      // newPath.removeLast();
-
-      print(newPath);
-
-      newPath.forEach((index) {
-        // logger.i({"index:": index, "datalist:": _activeDatalist.datalist});
-        newData.children = newData.children[index].children;
-      });
-
-      print(newData.toJson());
-      print(rootData.toJson());
-
-      // _activePersonBox.putAt(
-      //   _activeDatalist.index,
-      // );
+      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
     }
   }
 
   void nestFurther(int index) {
-    _activeDatalist.index = index;
-    _activeDatalist.isRoot = false;
+    _activeData.rootNodeIndex = index;
+
+    if (_activeData.isRoot) {
+      // If it is root? We need to change to current root...
+      _activeData.rootNode = _activeData.parentChildren[index];
+      // If we nest past root, it won't be root
+      _activeData.isRoot = false;
+    }
+
     _path.add(index);
 
-    _activeDatalist.datalist = _activeDatalist.datalist[index].children;
-
-    // logger.i(["Added item to path:", _path]);
-    print("Added item: " + _path.toString());
+    _activeData.parentChildren = _activeData.parentChildren[index].children;
   }
 
   void popNesting() {
     if (_path.length != 0) {
       var finalIndex = _path.removeLast();
-      print("Removed item: " + _path.toString());
 
-      _activeDatalist.datalist = _activePersonBox.values.toList();
+      _activeData.parentChildren = _activePersonBox.values.toList();
 
+      // Traverse the path to get the futhest most item
       _path.forEach((index) {
-        // logger.i({"index:": index, "datalist:": _activeDatalist.datalist});
-        _activeDatalist.datalist = _activeDatalist.datalist[index].children;
+        _activeData.parentChildren = _activeData.parentChildren[index].children;
       });
 
-      _activeDatalist.isRoot = false;
-      _activeDatalist.index = finalIndex;
+      _activeData.isRoot = false;
+      _activeData.rootNodeIndex = finalIndex;
     } else {
-      // _path.clear();
-      _activeDatalist.isRoot = true;
+      _activeData.isRoot = true;
     }
 
     // logger.i(_path);

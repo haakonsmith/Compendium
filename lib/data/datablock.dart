@@ -19,11 +19,7 @@ class Datablock {
   int colourValue;
 
   @HiveField(2)
-<<<<<<< Updated upstream
-  List<Datablock> children = List<Datablock>();
-=======
   List<Datablock> children = List();
->>>>>>> Stashed changes
 
   @HiveField(3)
   String value;
@@ -33,15 +29,31 @@ class Datablock {
     @required this.colourValue,
     @required this.value,
   });
+  String toString() =>
+      "name: " +
+      name +
+      " colourValue: " +
+      colourValue.toString() +
+      " value: " +
+      value +
+      " children?: " +
+      (children == null).toString();
 
-<<<<<<< Updated upstream
   Map toJson() =>
       {"name": name, "children": children.map((c) => c.toJson()).toList()};
-=======
-  static Datablock blank() {
-    return Datablock(name: "", colourValue: Colors.black.value);
+
+  /// Performs a deep copy of the object
+  Datablock copy() {
+    var newDatablock =
+        Datablock(name: name, colourValue: colourValue, value: value);
+    newDatablock.children = children.toList();
+    return newDatablock;
   }
->>>>>>> Stashed changes
+
+  static Datablock blank() {
+    return Datablock(
+        name: "", colourValue: Colors.black.value, value: "Nothing");
+  }
 
   Widget buildPreview(BuildContext context, int datablockId) {
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
