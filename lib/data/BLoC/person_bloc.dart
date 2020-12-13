@@ -38,7 +38,7 @@ class ActiveData {
 }
 
 // It's a change notifier because while it's loading data
-// This tracks the active person, and the active datablock
+/// This tracks the active person, and the active datablock
 class PersonBloc extends ChangeNotifier {
   // This is the active person, basically the person that will be shown on the person screen
   Person _activePerson;
@@ -56,10 +56,12 @@ class PersonBloc extends ChangeNotifier {
   bool _updating = true;
 
   /// Constructs a datablock from the databox
-  Datablock get rootDatablock =>
-      Datablock(_activePerson.firstName + " " + _activePerson.lastName, "",
-          colourValue: _activeColor.value,
-          children: _activePersonBox.values.toList());
+  Datablock get rootDatablock => Datablock(
+        _activePerson.firstName + " " + _activePerson.lastName,
+        "",
+        colourValue: _activeColor.value,
+        children: _activePersonBox.values.toList(),
+      );
 
   // Create the box or open it
   Future<void> setActivePerson(Person person, {Color color}) async {
@@ -82,8 +84,7 @@ class PersonBloc extends ChangeNotifier {
   }
 
   Future<void> setActivePersonFromIndex(int personIndex, {Color color}) async {
-    setActivePerson(Hive.box<Person>("people").getAt(personIndex),
-        color: color);
+    setActivePerson(Hive.box<Person>("people").getAt(personIndex), color: color);
   }
 
   bool get loading => _updating;
@@ -112,11 +113,14 @@ class PersonBloc extends ChangeNotifier {
     return _activePersonBox;
   }
 
-  Datablock getParentFromActive(List<int> path) {
+
+  /// this hasn't been implemented yet, so I wouldn't advise using it
+  Datablock navigateToNested(List<int> path) {
     var rootData = _activePersonBox.getAt(_path.first);
     Datablock parent = rootData;
 
-    for (var i = 0; i < path.length; i++) {
+    // we're already at root so no need to start from 0
+    for (var i = 1; i < path.length; i++) {
       parent = parent.children[path[i]];
     }
 

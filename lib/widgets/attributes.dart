@@ -38,8 +38,7 @@ class Attribute extends StatelessWidget {
     BuildContext context, {
     void Function() onChange,
   }) {
-    Attribute newAttribute =
-        Attribute(datablock: Datablock.blank(), onChange: onChange);
+    Attribute newAttribute = Attribute(datablock: Datablock.blank(), onChange: onChange);
     newAttribute.editData(context, creation: true);
     return newAttribute;
   }
@@ -62,10 +61,9 @@ class Attribute extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           content: Container(
-            height: 280,
+            height: 330,
             child: Column(
               children: [
                 Container(
@@ -85,15 +83,16 @@ class Attribute extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.only(bottom: 20),
                   child: TextField(
-                      cursorColor: Color(datablock.colourValue),
-                      controller: valueController,
-                      decoration: InputDecoration(
-                        labelText: "Attribute Value",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: parentDatablock.color),
-                        ),
-                      )),
+                    cursorColor: Color(datablock.colourValue),
+                    controller: valueController,
+                    decoration: InputDecoration(
+                      labelText: "Attribute Value",
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: parentDatablock.color),
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.all(8.0),
@@ -107,20 +106,15 @@ class Attribute extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: !creation
-                            ? MainAxisAlignment.spaceEvenly
-                            : MainAxisAlignment.center,
+                        mainAxisAlignment: !creation ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
                         children: [
                           // if it doesn't exist, don't show delete
                           !creation
                               ? RaisedButton(
                                   color: Color(datablock.colourValue),
                                   onPressed: () {
-                                    PersonBloc.of(context)
-                                        .removeDatablockFromActive(
-                                            datablock, index);
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop('dialog');
+                                    PersonBloc.of(context).removeDatablockFromActive(datablock, index);
+                                    Navigator.of(context, rootNavigator: true).pop('dialog');
 
                                     onChange();
                                   },
@@ -138,17 +132,16 @@ class Attribute extends StatelessWidget {
                               datablock.value = valueController.text;
                               datablock.colourValue = colorController.value;
 
+                              print(index);
+                              print(datablock);
+
                               if (creation) {
-                                PersonBloc.of(context)
-                                    .addDatablockToActive(datablock);
+                                PersonBloc.of(context).addDatablockToActive(datablock);
                               } else {
-                                PersonBloc.of(context)
-                                    .updateDatablockFromActive(
-                                        datablock, index);
+                                PersonBloc.of(context).updateDatablockFromActive(datablock, index);
                               }
 
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
 
                               onChange();
                             },
@@ -162,9 +155,7 @@ class Attribute extends StatelessWidget {
                       SizedBox(height: 20),
                       RaisedButton(
                         color: Color(datablock.colourValue),
-                        onPressed: () =>
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('dialog'),
+                        onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
                         child: Text(
                           !creation ? "Cancel" : "Discard",
                           style: TextStyle(color: Colors.white),
@@ -184,53 +175,52 @@ class Attribute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: onTap,
-        child: Card(
-            elevation: 0,
-            child: Container(
-              height: 50,
-              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(left: 10, right: 15),
-                    child: icon == null ? Container() : icon,
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          name == null ? "" : name,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          ":",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          value == null ? "" : value,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(left: 15, right: 10),
-                    child: IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () => editData(context, creation: false),
-                    ),
-                  ),
-                ],
+      onTap: onTap,
+      child: Card(
+        elevation: 0,
+        child: Container(
+          height: 50,
+          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 15),
+                child: icon == null ? Container() : icon,
               ),
-            )));
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      name == null ? "" : name,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      ":",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Text(
+                      value == null ? "" : value,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 15, right: 10),
+                child: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () => editData(context, creation: false),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

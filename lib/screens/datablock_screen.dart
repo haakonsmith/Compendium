@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 
 // Fundamentally all a datablock screen needs is a list of datablocks. This can either be the root datablock box or datablock.children
 class DatablockScreen extends StatefulWidget {
-  DatablockScreen({Key key, this.datalistfuture}) : super(key: key);
+  DatablockScreen({Key key, this.dataListFuture}) : super(key: key);
 
   static final String routeName = '/datablock';
-  Future<List<Datablock>> datalistfuture;
+  Future<List<Datablock>> dataListFuture;
 
   @override
   State<StatefulWidget> createState() => _DatablockScreenState();
@@ -24,9 +24,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
   @override
   Widget build(BuildContext context) {
     // Good sir please rebuild widget when this changes  \/
-    datablock = PersonBloc.of(context, listen: true).activeDatablock ??
-        Datablock("Loading...", "",
-            colourValue: Theme.of(context).primaryColor.value);
+    datablock = PersonBloc.of(context, listen: true).activeDatablock ?? Datablock("Loading...", "", colourValue: Theme.of(context).primaryColor.value);
 
     return Scaffold(
       appBar: PillAppBar(
@@ -38,9 +36,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
         backgroundColor: Color(datablock.colourValue),
       ),
       body: Container(
-        child: PersonBloc.of(context).loading
-            ? CompendiumThemeData.of(context).dataLoadingIndicator
-            : _buildListView(context, datablock.children),
+        child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock.children),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color(datablock.colourValue),
@@ -69,14 +65,14 @@ class _DatablockScreenState extends State<DatablockScreen> {
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
           var attribute = Attribute(
-              onChange: () => setState(() => {}),
-              onTap: () {
-                PersonBloc.of(context).nestFurther(index);
-                Navigator.of(context).push(
-                    NestedPageRoute(builder: (context) => DatablockScreen()));
-              },
-              datablock: datablocks[index],
-              index: index);
+            onChange: () => setState(() => {}),
+            onTap: () {
+              PersonBloc.of(context).nestFurther(index);
+              Navigator.of(context).push(NestedPageRoute(builder: (context) => DatablockScreen()));
+            },
+            datablock: datablocks[index],
+            index: index,
+          );
           return attribute.build(context);
           // return InkWell(
           //     onTap: () {
