@@ -5,10 +5,10 @@ import 'package:compendium/routers/instant_page_route.dart';
 import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/screens/datablock_screen.dart';
 import 'package:compendium/screens/index_screen.dart';
-import 'package:compendium/screens/person_screen.dart';
 import 'package:compendium/screens/settings_screen.dart';
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,11 +16,17 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:compendium/data/person.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter/scheduler.dart' show timeDilation;
+// For debug purposes
+// import 'package:flutter/scheduler.dart' show timeDilation;
+
+var logger = Logger(
+  printer: PrettyPrinter(),
+);
 
 void main() async {
   // For debug purposes
   // timeDilation = 10.0;
+
   await Hive.initFlutter("hiveData");
 
   Hive.registerAdapter(DatablockAdapter());
@@ -67,20 +73,13 @@ class CompendiumApp extends StatelessWidget {
           if (uriSegments.first == 'person' && uriSegments.length == 2) {
             var personIndex = int.parse(uriSegments[1]);
 
-            PersonBloc.of(context).setActivePersonFromIndex(personIndex);
+            // Set the colour using this... Because otherwise weird stuff
+            PersonBloc.of(context).setActivePersonFromIndex(personIndex,
+                color: CompendiumThemeData.of(context, listen: false)
+                    .materialTheme
+                    .primaryColor);
 
-            return NestedPageRoute(builder: (context) => PersonScreen());
-          }
-
-          if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
-            if (PersonBloc.of(context).activePerson == null) {
-              return MaterialPageRoute(builder: (context) => IndexScreen());
-            }
-            return NestedPageRoute(
-              builder: (context) => DatablockScreen(
-                datablockIndex: int.parse(uriSegments[1]),
-              ),
-            );
+            return NestedPageRoute(builder: (context) => DatablockScreen());
           }
 
           // index should be the default

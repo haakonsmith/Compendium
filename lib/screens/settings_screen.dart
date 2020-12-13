@@ -19,6 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     settingsBloc = SettingsBloc.of(context, listen: true);
 
     return Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: PillAppBar(title: Text("Settings")),
         drawer: NavDrawer(),
         body: Container(

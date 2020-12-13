@@ -39,5 +39,9 @@ class PersonAdapter extends TypeAdapter<Person> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is PersonAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PersonAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

@@ -20,11 +20,13 @@ class PillAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget title;
   final Widget leading;
   final Function onPressed;
+  final Function onBackButtonPressed;
   final Function onTitleTapped;
   final double elevation;
   final bool automaticallyImplyLeading;
   final Color backgroundColor;
-  final TextStyle titleTextStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white);
+  final TextStyle titleTextStyle =
+      TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white);
 
   @override
   final Size preferredSize;
@@ -38,6 +40,7 @@ class PillAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.elevation = 10,
     this.backgroundColor,
     this.automaticallyImplyLeading = true,
+    this.onBackButtonPressed,
   }) : preferredSize = Size.fromHeight(60.0);
 
   State<StatefulWidget> createState() => _PillAppBarState();
@@ -54,9 +57,13 @@ class _PillAppBarState extends State<PillAppBar> {
 
     final bool canPop = parentRoute?.canPop ?? false;
 
-    backgroundColor = widget?.backgroundColor ?? appTheme.materialTheme.accentColor;
+    backgroundColor =
+        widget?.backgroundColor ?? appTheme.materialTheme.accentColor;
 
-    titleTextStyle = widget.titleTextStyle.merge(TextStyle(color: (backgroundColor ?? Colors.white).computeLuminance() > 0.5 ? Colors.black : Colors.white));
+    titleTextStyle = widget.titleTextStyle.merge(TextStyle(
+        color: (backgroundColor ?? Colors.white).computeLuminance() > 0.5
+            ? Colors.black
+            : Colors.white));
 
     Widget leading = widget.leading;
 
@@ -68,22 +75,29 @@ class _PillAppBarState extends State<PillAppBar> {
           tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
         );
       } else {
-        if (canPop) leading = const BackButton();
+        if (canPop)
+          leading = BackButton(
+            onPressed: widget.onBackButtonPressed,
+          );
       }
     }
 
     // return _drawSplitAppBar(appTheme, context, leading);
-    return canPop ? _buildPillAppBar(appTheme, context, leading) : _buildSplitAppBar(appTheme, context, leading);
+    return canPop
+        ? _buildPillAppBar(appTheme, context, leading)
+        : _buildSplitAppBar(appTheme, context, leading);
   }
 
-  Widget _buildAppBarButton(CompendiumThemeData appTheme, BuildContext context, Widget leading) {
+  Widget _buildAppBarButton(
+      CompendiumThemeData appTheme, BuildContext context, Widget leading) {
     return MaterialButton(
       height: 50,
       minWidth: 50,
       shape: kBackButtonShape,
       elevation: widget.elevation,
       onPressed: widget.onPressed,
-      child: IconTheme.merge(data: appTheme.materialTheme.primaryIconTheme, child: leading),
+      child: IconTheme.merge(
+          data: appTheme.materialTheme.primaryIconTheme, child: leading),
     );
   }
 
@@ -103,7 +117,9 @@ class _PillAppBarState extends State<PillAppBar> {
   Widget _buildTitleAlign() {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Padding(padding: const EdgeInsets.only(left: 20), child: DefaultTextStyle(child: widget.title, style: titleTextStyle)),
+      child: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: DefaultTextStyle(child: widget.title, style: titleTextStyle)),
     );
   }
 
@@ -125,7 +141,8 @@ class _PillAppBarState extends State<PillAppBar> {
     );
   }
 
-  SafeArea _buildPillAppBar(CompendiumThemeData appTheme, BuildContext context, Widget leading) {
+  SafeArea _buildPillAppBar(
+      CompendiumThemeData appTheme, BuildContext context, Widget leading) {
     return SafeArea(
       child: Hero(
         tag: "_topBarBtn",
@@ -151,7 +168,8 @@ class _PillAppBarState extends State<PillAppBar> {
                   child: Card(
                     elevation: 0,
                     color: backgroundColor,
-                    child: InkWell(onTap: widget.onTitleTapped, child: _buildTitleAlign()),
+                    child: InkWell(
+                        onTap: widget.onTitleTapped, child: _buildTitleAlign()),
                   ),
                 ),
               ],
@@ -162,66 +180,65 @@ class _PillAppBarState extends State<PillAppBar> {
     );
   }
 
-  SafeArea _buildSplitAppBar(CompendiumThemeData appTheme, BuildContext context, Widget leading) {
+  Widget _buildSplitAppBar(
+      CompendiumThemeData appTheme, BuildContext context, Widget leading) {
     return SafeArea(
-      child: Column(
-        children: [
-          IconTheme.merge(
-            data: appTheme.materialTheme.primaryIconTheme,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Hero(
-                  tag: "_topBarBtn",
-                  transitionOnUserGestures: true,
-                  createRectTween: (Rect begin, Rect end) {
-                    return RectTween(
-                      begin: Rect.fromCenter(
-                        center: Offset(
-                          // Make a rectangle that is centred at the middle of the right main split app bar
-                          MediaQuery.of(context).size.width / (1.5 * 2 * 2),
-                          50 / 2,
-                        ),
-                        // Make a rectangle that is the width of the right main split app bar
-                        width: MediaQuery.of(context).size.width / (1.5),
+      child: IconTheme.merge(
+        data: appTheme.materialTheme.primaryIconTheme,
+        child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Hero(
+                tag: "_topBarBtn",
+                transitionOnUserGestures: true,
+                createRectTween: (Rect begin, Rect end) {
+                  return RectTween(
+                    begin: Rect.fromCenter(
+                      center: Offset(
+                        // Make a rectangle that is centred at the middle of the right main split app bar
+                        MediaQuery.of(context).size.width / (1.5 * 2 * 2),
+                        50 / 2,
+                      ),
+                      // Make a rectangle that is the width of the right main split app bar
+                      width: MediaQuery.of(context).size.width / (1.5),
+                      height: 50,
+                    ),
+                    end: end,
+                  );
+                },
+                child: Card(
+                  margin: EdgeInsets.all(0),
+                  color: backgroundColor,
+                  elevation: widget.elevation,
+                  shape: kBackButtonShape,
+                  child: _buildAppBarButton(appTheme, context, leading),
+                ),
+              ),
+              Hero(
+                tag: 'title',
+                transitionOnUserGestures: true,
+                createRectTween: _createRightCentredRectTween,
+                child: Card(
+                  margin: EdgeInsets.only(top: 2),
+                  color: backgroundColor,
+                  elevation: widget.elevation,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: appTheme.borderRadius.bottomLeft,
+                      topLeft: appTheme.borderRadius.bottomLeft,
+                    ),
+                  ),
+                  child: InkWell(
+                    onTap: widget.onTitleTapped,
+                    child: Container(
+                        width: MediaQuery.of(context).size.width / 1.5,
                         height: 50,
-                      ),
-                      end: end,
-                    );
-                  },
-                  child: Card(
-                    margin: EdgeInsets.all(0),
-                    color: backgroundColor,
-                    elevation: widget.elevation,
-                    shape: kBackButtonShape,
-                    child: _buildAppBarButton(appTheme, context, leading),
+                        child: _buildTitleAlign()),
                   ),
                 ),
-                Hero(
-                  tag: 'title',
-                  transitionOnUserGestures: true,
-                  createRectTween: _createRightCentredRectTween,
-                  child: Card(
-                    margin: EdgeInsets.only(top: 2),
-                    color: backgroundColor,
-                    elevation: widget.elevation,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: appTheme.borderRadius.bottomLeft,
-                        topLeft: appTheme.borderRadius.bottomLeft,
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: widget.onTitleTapped,
-                      child: Container(width: MediaQuery.of(context).size.width / 1.5, height: 50, child: _buildTitleAlign()),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ]),
       ),
     );
   }
