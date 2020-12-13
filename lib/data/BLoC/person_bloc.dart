@@ -15,25 +15,35 @@ var logger = Logger(
 
 /// This is just a neat dataclass to wrap all the attributes in
 class ActiveData {
-  // active data list, this abstracts away the whole root box or simply a datablock children list
+  /// active datablock
   Datablock datablock;
 
   // This is important... But I forgot why
   // I think it's the rootNode index
   int rootNodeIndex = 0;
 
+  int indexInParentNode = 0;
+
   // If it's a root node we don't need to do the nesting stuff
   // see references
   bool isRoot = true;
 
-  // Track the active rootnode
+  /// Track the active rootnode
   Datablock rootNode;
+
+  /// Updates the active data with children.elementAt(index) data
+  void traverseDown(int index) {
+    datablock = datablock.children[index];
+  }
 }
 
 // It's a change notifier because while it's loading data
 class PersonBloc extends ChangeNotifier {
   // This is the active person, basically the person that will be shown on the person screen
   Person _activePerson;
+
+  /// Because a person is not a datablock it doesn't store a color
+  Color _activeColor;
 
   Box<Datablock> _activePersonBox;
   ActiveData _activeData = ActiveData();
@@ -43,6 +53,12 @@ class PersonBloc extends ChangeNotifier {
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
+
+  /// Constructs a datablock from the databox
+  Datablock get rootDatablock =>
+      Datablock(_activePerson.firstName + " " + _activePerson.lastName, "",
+          colourValue: _activeColor.value,
+          children: _activePersonBox.values.toList());
 
   // Create the box or open it
   Future<void> setActivePerson(Person person, {Color color}) async {
@@ -54,16 +70,13 @@ class PersonBloc extends ChangeNotifier {
     }
 
     _activePerson = person;
+    _activeColor = color;
     _activePersonBox = await Hive.openBox<Datablock>(_activePerson.databoxID);
 
-    _updating = false;
-
-    print("FROM set active person" + color.toString());
-
     _activeData.isRoot = true;
-    _activeData.datablock = Datablock(
-        person.firstName + " " + person.lastName, "",
-        colourValue: color.value, children: _activePersonBox.values.toList());
+    _activeData.datablock = rootDatablock;
+
+    _updating = false;
     notifyListeners();
   }
 
@@ -110,71 +123,45 @@ class PersonBloc extends ChangeNotifier {
   }
 
   void addDatablockToActive(Datablock datablock) {
+    _activeData.datablock.children.add(datablock);
+
     if (_activeData.isRoot) {
-      _activeData.datablock.children.add(datablock);
       _activePersonBox.add(datablock);
     } else {
-      /// This is here because, it would break my heart to remove it. Imagine going down a massive rabbit hole...
-      /// "Am I disabled?"
-      // Start the node search at the root node
-      // The reason something like this ->
-      // Datablock rootNode = _activePersonBox.values.toList()[_path.first]
-      // is not used, is because well... I think that it might break the reference,
-      // but I'm not sure, for now this works
-      // Datablock newNode = _activeDatalist.rootNode;
-
-      // // parentNode
-      // for (var i = 0; i < _path.length - 1; i++) {
-      //   newNode = newNode.children[_path[i]];
-      // }
-
-      // Now you may be thinking that this is stupid, however, if we do not,
-      // then Stack overflow gets mad.
-      // This is possibly because the ownership of the reference to this object
-      // is not transfered to the List<Datablock>, and hence, gets deleted
-      // But your guess is as good as mine
-      _activeData.datablock.children.add(datablock);
-      // print(_activeData.rootNode.toString());
-      // print(_activeData.rootNode.toJson());
-
       _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
     }
   }
 
   void nestFurther(int index) {
-    _activeData.rootNodeIndex = index;
+    _activeData.indexInParentNode = index;
 
     if (_activeData.isRoot) {
+      _activeData.rootNodeIndex = index;
       // If it is root? We need to change to current root...
       _activeData.rootNode = _activeData.datablock.children[index];
+      logger.i("setting rootNode");
       // If we nest past root, it won't be root
       _activeData.isRoot = false;
     }
 
     _path.add(index);
 
-    _activeData.datablock.colourValue =
-        _activeData.datablock.children[index].colourValue;
-    _activeData.datablock.name = _activeData.datablock.children[index].name;
-    _activeData.datablock.value = _activeData.datablock.children[index].value;
-    _activeData.datablock.children =
-        _activeData.datablock.children[index].children;
+    _activeData.traverseDown(index);
   }
 
   void popNesting() {
     if (_path.length != 0) {
       var finalIndex = _path.removeLast();
 
-      _activeData.datablock.children = _activePersonBox.values.toList();
+      _activeData.datablock = rootDatablock;
 
       // Traverse the path to get the futhest most item
       _path.forEach((index) {
-        _activeData.datablock.children =
-            _activeData.datablock.children[index].children;
+        _activeData.traverseDown(index);
       });
 
       _activeData.isRoot = false;
-      _activeData.rootNodeIndex = finalIndex;
+      _activeData.indexInParentNode = finalIndex;
     } else {
       _activeData.isRoot = true;
     }
@@ -182,6 +169,28 @@ class PersonBloc extends ChangeNotifier {
 
   ValueListenable<Box<Datablock>> listenForDatablocks() {
     return _activePersonBox.listenable();
+  }
+
+  void removeDatablockFromActive(Datablock datablock, int index) {
+    // _activeData.datablock.children.remove(datablock);
+    // Probably more performant than the above
+    _activeData.datablock.children.removeAt(index);
+
+    if (_activeData.isRoot) {
+      _activePersonBox.deleteAt(index);
+    } else {
+      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+    }
+  }
+
+  void updateDatablockFromActive(Datablock datablock, int index) {
+    _activeData.datablock.children[index] = datablock;
+
+    if (_activeData.isRoot) {
+      _activePersonBox.putAt(index, datablock);
+    } else {
+      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+    }
   }
 
   void addDatablockToActivePerson(Datablock datablock) {

@@ -22,6 +22,7 @@ class _IndexScreenState extends State<IndexScreen> {
     personBloc = PersonBloc.of(context, listen: true);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: PillAppBar(title: Text("People Index")),
       drawer: NavDrawer(),
       body: Container(

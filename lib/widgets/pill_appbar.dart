@@ -180,70 +180,65 @@ class _PillAppBarState extends State<PillAppBar> {
     );
   }
 
-  SafeArea _buildSplitAppBar(
+  Widget _buildSplitAppBar(
       CompendiumThemeData appTheme, BuildContext context, Widget leading) {
     return SafeArea(
-      child: Column(
-        children: [
-          IconTheme.merge(
-            data: appTheme.materialTheme.primaryIconTheme,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Hero(
-                  tag: "_topBarBtn",
-                  transitionOnUserGestures: true,
-                  createRectTween: (Rect begin, Rect end) {
-                    return RectTween(
-                      begin: Rect.fromCenter(
-                        center: Offset(
-                          // Make a rectangle that is centred at the middle of the right main split app bar
-                          MediaQuery.of(context).size.width / (1.5 * 2 * 2),
-                          50 / 2,
-                        ),
-                        // Make a rectangle that is the width of the right main split app bar
-                        width: MediaQuery.of(context).size.width / (1.5),
+      child: IconTheme.merge(
+        data: appTheme.materialTheme.primaryIconTheme,
+        child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Hero(
+                tag: "_topBarBtn",
+                transitionOnUserGestures: true,
+                createRectTween: (Rect begin, Rect end) {
+                  return RectTween(
+                    begin: Rect.fromCenter(
+                      center: Offset(
+                        // Make a rectangle that is centred at the middle of the right main split app bar
+                        MediaQuery.of(context).size.width / (1.5 * 2 * 2),
+                        50 / 2,
+                      ),
+                      // Make a rectangle that is the width of the right main split app bar
+                      width: MediaQuery.of(context).size.width / (1.5),
+                      height: 50,
+                    ),
+                    end: end,
+                  );
+                },
+                child: Card(
+                  margin: EdgeInsets.all(0),
+                  color: backgroundColor,
+                  elevation: widget.elevation,
+                  shape: kBackButtonShape,
+                  child: _buildAppBarButton(appTheme, context, leading),
+                ),
+              ),
+              Hero(
+                tag: 'title',
+                transitionOnUserGestures: true,
+                createRectTween: _createRightCentredRectTween,
+                child: Card(
+                  margin: EdgeInsets.only(top: 2),
+                  color: backgroundColor,
+                  elevation: widget.elevation,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: appTheme.borderRadius.bottomLeft,
+                      topLeft: appTheme.borderRadius.bottomLeft,
+                    ),
+                  ),
+                  child: InkWell(
+                    onTap: widget.onTitleTapped,
+                    child: Container(
+                        width: MediaQuery.of(context).size.width / 1.5,
                         height: 50,
-                      ),
-                      end: end,
-                    );
-                  },
-                  child: Card(
-                    margin: EdgeInsets.all(0),
-                    color: backgroundColor,
-                    elevation: widget.elevation,
-                    shape: kBackButtonShape,
-                    child: _buildAppBarButton(appTheme, context, leading),
+                        child: _buildTitleAlign()),
                   ),
                 ),
-                Hero(
-                  tag: 'title',
-                  transitionOnUserGestures: true,
-                  createRectTween: _createRightCentredRectTween,
-                  child: Card(
-                    margin: EdgeInsets.only(top: 2),
-                    color: backgroundColor,
-                    elevation: widget.elevation,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: appTheme.borderRadius.bottomLeft,
-                        topLeft: appTheme.borderRadius.bottomLeft,
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: widget.onTitleTapped,
-                      child: Container(
-                          width: MediaQuery.of(context).size.width / 1.5,
-                          height: 50,
-                          child: _buildTitleAlign()),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ]),
       ),
     );
   }

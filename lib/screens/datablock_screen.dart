@@ -29,9 +29,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
         Datablock("Loading...", "",
             colourValue: Theme.of(context).primaryColor.value);
 
-    print(datablock.toString());
-    print(Theme.of(context).primaryColor);
-
     return Scaffold(
       appBar: PillAppBar(
         title: Text(datablock.name),
@@ -47,13 +44,15 @@ class _DatablockScreenState extends State<DatablockScreen> {
             : _buildListView(context, datablock.children),
       ),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Color(datablock.colourValue),
-          child: Icon(Icons.add),
-          // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
-          // so I'm just doing this to avoid copy-pasting the dialog code here too
-          onPressed: () => setState(() {
-                PersonBloc.of(context).addDatablockToActive(Datablock.blank());
-              })),
+        backgroundColor: Color(datablock.colourValue),
+        child: Icon(Icons.add),
+        // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
+        // so I'm just doing this to avoid copy-pasting the dialog code here too
+        onPressed: () => Attribute.fromDialog(
+          context,
+          onChange: () => setState(() {}),
+        ),
+      ),
     );
   }
 
@@ -70,7 +69,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
     return ListView.builder(
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
-          var child = datablocks.elementAt(index);
           var attribute = Attribute(
               onChange: () => setState(() => {}),
               onTap: () {
@@ -78,7 +76,8 @@ class _DatablockScreenState extends State<DatablockScreen> {
                 Navigator.of(context).push(
                     NestedPageRoute(builder: (context) => DatablockScreen()));
               },
-              datablock: datablock.children.elementAt(index));
+              datablock: datablocks[index],
+              index: index);
           return attribute.build(context);
           // return InkWell(
           //     onTap: () {

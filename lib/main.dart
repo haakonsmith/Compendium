@@ -26,6 +26,7 @@ var logger = Logger(
 void main() async {
   // For debug purposes
   // timeDilation = 10.0;
+
   await Hive.initFlutter("hiveData");
 
   Hive.registerAdapter(DatablockAdapter());
@@ -78,41 +79,8 @@ class CompendiumApp extends StatelessWidget {
                     .materialTheme
                     .primaryColor);
 
-            return NestedPageRoute(
-                builder: (context) => DatablockScreen(
-                    // datalistfuture:
-                    //     PersonBloc.of(context).listenToDatablockBox(),
-                    ));
-            // return NestedPageRoute(
-            //     settings: settings, builder: (context) => PersonScreen());
+            return NestedPageRoute(builder: (context) => DatablockScreen());
           }
-
-          // if (uriSegments.first == 'datablock' && uriSegments.length >= 2) {
-          //   if (PersonBloc.of(context).activePerson == null) {
-          //     return MaterialPageRoute(
-          //         settings: settings, builder: (context) => IndexScreen());
-          //   }
-          //   PersonBloc.of(context).activeDatablock =
-          //       PersonBloc.of(context).datablockOfRoute(uriSegments);
-
-          //   return NestedPageRoute(
-          //     settings: settings,
-          //     builder: (context) => DatablockScreen(
-          //       datablockIndex: int.parse(uriSegments[1]),
-          //     ),
-          //   );
-          // }
-
-          // if (uriSegments.first == 'datablock' && uriSegments.length == 2) {
-          //   if (PersonBloc.of(context).activePerson == null) {
-          //     return MaterialPageRoute(builder: (context) => IndexScreen());
-          //   }
-          //   return NestedPageRoute(
-          //     builder: (context) => DatablockScreen(
-          //       datablockIndex: int.parse(uriSegments[1]),
-          //     ),
-          //   );
-          // }
 
           // index should be the default
           return InstantPageRoute(builder: (context) => IndexScreen());

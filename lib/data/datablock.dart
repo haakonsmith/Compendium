@@ -18,6 +18,8 @@ class Datablock {
   @HiveField(1)
   int colourValue;
 
+  Color get color => Color(colourValue);
+
   @HiveField(2)
   List<Datablock> children = <Datablock>[];
 
@@ -40,19 +42,23 @@ class Datablock {
       " children?: " +
       (children == null).toString();
 
-  Map toJson() =>
-      {"name": name, "children": children.map((c) => c.toJson()).toList()};
+  Map toJson() => {
+        "name": name,
+        "children": children.map((c) => "null" ?? c.toJson()).toList()
+      };
 
   /// Performs a deep copy of the object
   Datablock copy() {
     var newDatablock = Datablock(name, value, colourValue: colourValue);
-    print(children.toString());
-    newDatablock.children = children.toList();
+    newDatablock.children = children.map((c) => c.copy()).toList();
     return newDatablock;
   }
 
+  bool operator ==(o) =>
+      o is Datablock && name == o.name && colourValue == o.colourValue;
+
   static Datablock blank() {
-    return Datablock("", "Nothing", colourValue: Colors.black.value);
+    return Datablock("", "");
   }
 
   Widget buildPreview(BuildContext context, int datablockId) {

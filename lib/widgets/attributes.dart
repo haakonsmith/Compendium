@@ -1,13 +1,14 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:flutter/material.dart';
+import 'package:compendium/widgets/color_form_field.dart';
 import 'package:hive/hive.dart';
 
 /// # Attribute
 ///
 /// This is a single attribute of a datablock.
 class Attribute extends StatelessWidget {
-  Attribute({this.icon, this.datablock, this.onChange, this.onTap})
+  Attribute({this.icon, this.datablock, this.onChange, this.onTap, this.index})
       : name = datablock.name,
         value = datablock.value;
 
@@ -27,6 +28,9 @@ class Attribute extends StatelessWidget {
   @required
   final Datablock datablock;
 
+  @required
+  final int index;
+
   /// This fires off whenever the user adds a new attribute or finishes an edit.
   final void Function() onChange;
 
@@ -37,19 +41,20 @@ class Attribute extends StatelessWidget {
   }) {
     Attribute newAttribute =
         Attribute(datablock: Datablock.blank(), onChange: onChange);
-    newAttribute.editData(context);
+    newAttribute.editData(context, creation: true);
     return newAttribute;
   }
 
   /// Creates a dialog where the user can edit the attribute name and value
-  void editData(BuildContext context) {
+  void editData(BuildContext context, {@required bool creation}) {
+    var parentDatablock = PersonBloc.of(context).activeDatablock;
+
     TextEditingController attributeController = TextEditingController();
     TextEditingController valueController = TextEditingController();
+    Color colorController = datablock.color ?? parentDatablock.color;
 
     if (name != null) attributeController.text = name;
     if (value != null) valueController.text = value;
-
-    var parentDatablock = PersonBloc.of(context).activeDatablock;
 
     // if we don't have a datablock, leave
     if (datablock == null) return;
@@ -61,48 +66,60 @@ class Attribute extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           content: Container(
-            height: 240,
+            height: 280,
             child: Column(
               children: [
                 Container(
                   margin: EdgeInsets.only(bottom: 20),
                   child: TextField(
-                    cursorColor: Color(parentDatablock.colourValue),
+                    cursorColor: parentDatablock.color,
                     controller: attributeController,
                     decoration: InputDecoration(
                       labelText: "Attribute Name",
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color(parentDatablock.colourValue)),
+                        borderSide: BorderSide(color: parentDatablock.color),
                       ),
                     ),
                   ),
                 ),
-                TextField(
-                  cursorColor: Color(datablock.colourValue),
-                  controller: valueController,
-                  decoration: InputDecoration(
-                    labelText: "Attribute Value",
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Color(parentDatablock.colourValue)),
-                    ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: TextField(
+                      cursorColor: Color(datablock.colourValue),
+                      controller: valueController,
+                      decoration: InputDecoration(
+                        labelText: "Attribute Value",
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: parentDatablock.color),
+                        ),
+                      )),
+                ),
+                Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: ColorFormField(
+                    onChanged: (color) => colorController = color,
+                    initialColor: colorController,
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 30),
+                  margin: EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
                       Row(
+                        mainAxisAlignment: !creation
+                            ? MainAxisAlignment.spaceEvenly
+                            : MainAxisAlignment.center,
                         children: [
                           // if it doesn't exist, don't show delete
-                          parentDatablock.children.contains(datablock)
+                          !creation
                               ? RaisedButton(
                                   color: Color(datablock.colourValue),
                                   onPressed: () {
-                                    parentDatablock.children.remove(datablock);
+                                    PersonBloc.of(context)
+                                        .removeDatablockFromActive(
+                                            datablock, index);
                                     Navigator.of(context, rootNavigator: true)
                                         .pop('dialog');
 
@@ -120,8 +137,17 @@ class Attribute extends StatelessWidget {
                             onPressed: () {
                               datablock.name = attributeController.text;
                               datablock.value = valueController.text;
-                              parentDatablock.children.add(datablock);
-                              print("adding some data");
+                              datablock.colourValue = colorController.value;
+
+                              if (creation) {
+                                PersonBloc.of(context)
+                                    .addDatablockToActive(datablock);
+                              } else {
+                                PersonBloc.of(context)
+                                    .updateDatablockFromActive(
+                                        datablock, index);
+                              }
+
                               Navigator.of(context, rootNavigator: true)
                                   .pop('dialog');
 
@@ -141,9 +167,7 @@ class Attribute extends StatelessWidget {
                             Navigator.of(context, rootNavigator: true)
                                 .pop('dialog'),
                         child: Text(
-                          (parentDatablock.children.contains(datablock))
-                              ? "Cancel"
-                              : "Discard",
+                          !creation ? "Cancel" : "Discard",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -203,7 +227,7 @@ class Attribute extends StatelessWidget {
                     padding: EdgeInsets.only(left: 15, right: 10),
                     child: IconButton(
                       icon: Icon(Icons.edit),
-                      onPressed: () => editData(context),
+                      onPressed: () => editData(context, creation: false),
                     ),
                   ),
                 ],
