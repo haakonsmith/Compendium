@@ -75,6 +75,7 @@ class CompendiumThemeData extends ChangeNotifier {
     scaffoldBackgroundColor: Colors.grey.shade900,
     dialogBackgroundColor: Colors.grey.shade900,
     cardColor: Colors.grey.shade900,
+    canvasColor: Colors.transparent,
     inputDecorationTheme: InputDecorationTheme(
       hintStyle: TextStyle(
         color: Colors.white,

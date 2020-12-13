@@ -1,11 +1,13 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/BLoC/settings_bloc.dart';
+import 'package:compendium/data/BLoC/template_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:compendium/routers/instant_page_route.dart';
 import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/screens/datablock_screen.dart';
 import 'package:compendium/screens/index_screen.dart';
 import 'package:compendium/screens/settings_screen.dart';
+import 'package:compendium/screens/template_screen.dart';
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -37,10 +39,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<CompendiumThemeData>(
-            create: (_) => CompendiumThemeData()),
+        ChangeNotifierProvider<CompendiumThemeData>(create: (_) => CompendiumThemeData()),
         ChangeNotifierProvider<PersonBloc>(create: (_) => PersonBloc()),
         ChangeNotifierProvider<SettingsBloc>(create: (_) => SettingsBloc()),
+        ChangeNotifierProvider<TemplateBloc>(create: (_) => TemplateBloc()),
       ],
       child: CompendiumApp(),
     ),
@@ -50,8 +52,7 @@ void main() async {
 class CompendiumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    CompendiumThemeData.of(context).isDark =
-        SettingsBloc.of(context, listen: true).darkTheme;
+    CompendiumThemeData.of(context).isDark = SettingsBloc.of(context, listen: true).darkTheme;
 
     return MaterialApp(
         theme: CompendiumThemeData.of(context).materialTheme,
@@ -64,9 +65,8 @@ class CompendiumApp extends StatelessWidget {
             return InstantPageRoute(builder: (context) => IndexScreen());
           }
 
-          if (settings.name == "/settings") {
-            return InstantPageRoute(builder: (context) => SettingsScreen());
-          }
+          if (settings.name == SettingsScreen.routeName) return InstantPageRoute(builder: (context) => SettingsScreen());
+          if (settings.name == TemplateScreen.routeName) return InstantPageRoute(builder: (context) => TemplateScreen());
 
           // Handle '/person/:index'
           var uriSegments = Uri.parse(settings.name).pathSegments;
@@ -74,10 +74,7 @@ class CompendiumApp extends StatelessWidget {
             var personIndex = int.parse(uriSegments[1]);
 
             // Set the colour using this... Because otherwise weird stuff
-            PersonBloc.of(context).setActivePersonFromIndex(personIndex,
-                color: CompendiumThemeData.of(context, listen: false)
-                    .materialTheme
-                    .primaryColor);
+            PersonBloc.of(context).setActivePersonFromIndex(personIndex, color: CompendiumThemeData.of(context, listen: false).materialTheme.primaryColor);
 
             return NestedPageRoute(builder: (context) => DatablockScreen());
           }

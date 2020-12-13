@@ -24,7 +24,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
   @override
   Widget build(BuildContext context) {
     // Good sir please rebuild widget when this changes  \/
-    datablock = PersonBloc.of(context, listen: true).activeDatablock ?? Datablock("Loading...", "", colourValue: Theme.of(context).primaryColor.value);
+    datablock = PersonBloc.of(context, listen: true).activeDatablock ?? Datablock("Loading...", "", colorValue: Theme.of(context).primaryColor.value);
 
     return Scaffold(
       appBar: PillAppBar(
@@ -33,13 +33,13 @@ class _DatablockScreenState extends State<DatablockScreen> {
           PersonBloc.of(context).popNesting();
           Navigator.of(context).pop();
         },
-        backgroundColor: Color(datablock.colourValue),
+        backgroundColor: Color(datablock.colorValue),
       ),
       body: Container(
         child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock.children),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(datablock.colourValue),
+        backgroundColor: Color(datablock.colorValue),
         child: Icon(Icons.add),
         // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
         // so I'm just doing this to avoid copy-pasting the dialog code here too
@@ -52,15 +52,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
   }
 
   Widget _buildListView(BuildContext context, List<Datablock> datablocks) {
-    // if (datablock.attributes == null || datablock.attributes.length == 0) {
-    //   return Center(
-    //     child: Text(
-    //       'No data here :)\nTry adding some with the add button\nin the bottom right corner.',
-    //       textAlign: TextAlign.center,
-    //     ),
-    //   );
-    // }
-
     return ListView.builder(
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
@@ -74,47 +65,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
             index: index,
           );
           return attribute.build(context);
-          // return InkWell(
-          //     onTap: () {
-          //       PersonBloc.of(context).nestFurther(index);
-          //       Navigator.of(context).push(
-          //           NestedPageRoute(builder: (context) => DatablockScreen()));
-          //     },
-          //     child: Row(
-          //       children: [
-          //         Text(child.value),
-          //       ],
-          //     ));
-          // .addDatablockToActiveDatablock(
-          //     Attribute.fromDialog(context).datablock)),
         });
   }
-
-  // Widget _buildListView(BuildContext context, Datablock datablock) {
-  //   if (datablock.children == null || datablock.children.length == 0) {
-  //     return Center(
-  //       child: Text(
-  //         'No data here :)\nTry adding some with the add button\nin the bottom right corner.',
-  //         textAlign: TextAlign.center,
-  //       ),
-  //     );
-  //   }
-
-  //   return ListView.builder(
-  //     itemCount: datablock.children.length,
-  //     itemBuilder: (context, index) {
-  //       var attribute = Attribute(
-  //           onChange: () => setState(() => {}),
-  //           onTap: () {
-  //             Navigator.of(context).pushNamed(
-  //                 ModalRoute.of(context).settings.name +
-  //                     "/datablock/" +
-  //                     index.toString());
-  //           },
-  //           datablock: datablock.children.elementAt(index));
-  //       return attribute.build(context);
-  //     },
-  //   );
-  //   // return Text("test");
-  // }
 }

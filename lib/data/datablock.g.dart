@@ -19,7 +19,7 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
     return Datablock(
       fields[0] as String,
       fields[3] as String,
-      colourValue: fields[1] as int,
+      colorValue: fields[1] as int,
       children: (fields[2] as List)?.cast<Datablock>(),
     );
   }
@@ -31,7 +31,7 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.colourValue)
+      ..write(obj.colorValue)
       ..writeByte(2)
       ..write(obj.children)
       ..writeByte(3)
@@ -42,9 +42,5 @@ class DatablockAdapter extends TypeAdapter<Datablock> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DatablockAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator ==(Object other) => identical(this, other) || other is DatablockAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }

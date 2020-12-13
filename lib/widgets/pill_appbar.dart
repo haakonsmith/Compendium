@@ -54,7 +54,7 @@ class _PillAppBarState extends State<PillAppBar> {
     final CompendiumThemeData appTheme = CompendiumThemeData.of(context);
     final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
 
-    final bool canPop = parentRoute?.canPop ?? false;
+    final bool canPop = (parentRoute?.canPop ?? false) && !Scaffold.of(context).isDrawerOpen;
 
     backgroundColor = widget?.backgroundColor ?? appTheme.materialTheme.accentColor;
 
