@@ -37,10 +37,10 @@ class ActiveData {
   }
 }
 
-// It's a change notifier because while it's loading data
+/// It's a change notifier because while it's loading data
 /// This tracks the active person, and the active datablock
 class PersonBloc extends ChangeNotifier {
-  // This is the active person, basically the person that will be shown on the person screen
+  /// This is the active/tracked person
   Person _activePerson;
 
   /// Because a person is not a datablock it doesn't store a color
@@ -56,12 +56,10 @@ class PersonBloc extends ChangeNotifier {
   bool _updating = true;
 
   /// Constructs a datablock from the databox
-  Datablock get rootDatablock => Datablock(
-        _activePerson.firstName + " " + _activePerson.lastName,
-        "",
-        colourValue: _activeColor.value,
-        children: _activePersonBox.values.toList(),
-      );
+  Datablock get rootDatablock =>
+      Datablock(_activePerson.firstName + " " + _activePerson.lastName, "",
+          colourValue: _activeColor.value,
+          children: _activePersonBox.values.toList());
 
   // Create the box or open it
   Future<void> setActivePerson(Person person, {Color color}) async {
@@ -83,8 +81,10 @@ class PersonBloc extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Quality of life improvement over setActivePerson
   Future<void> setActivePersonFromIndex(int personIndex, {Color color}) async {
-    setActivePerson(Hive.box<Person>("people").getAt(personIndex), color: color);
+    setActivePerson(Hive.box<Person>("people").getAt(personIndex),
+        color: color);
   }
 
   bool get loading => _updating;
@@ -93,12 +93,6 @@ class PersonBloc extends ChangeNotifier {
     if (_updating) return Person.blank();
 
     return _activePerson;
-  }
-
-  Future<List<Datablock>> listenToDatablockBox() async {
-    while (_updating) {}
-
-    return activePersonBox.values.toList();
   }
 
   Datablock get activeDatablock {
@@ -113,14 +107,17 @@ class PersonBloc extends ChangeNotifier {
     return _activePersonBox;
   }
 
+  ValueListenable<Box<Datablock>> listenToDatablocks() {
+    return _activePersonBox.listenable();
+  }
 
-  /// this hasn't been implemented yet, so I wouldn't advise using it
-  Datablock navigateToNested(List<int> path) {
+  /// Get parent based on path
+  @Deprecated("This shouldn't be used. May be useful for reference")
+  Datablock getParentFromActive(List<int> path) {
     var rootData = _activePersonBox.getAt(_path.first);
     Datablock parent = rootData;
 
-    // we're already at root so no need to start from 0
-    for (var i = 1; i < path.length; i++) {
+    for (var i = 0; i < path.length; i++) {
       parent = parent.children[path[i]];
     }
 
@@ -132,6 +129,29 @@ class PersonBloc extends ChangeNotifier {
 
     if (_activeData.isRoot) {
       _activePersonBox.add(datablock);
+    } else {
+      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+    }
+  }
+
+  /// Remove a datablock from the currently activeDatablock based on index
+  void removeDatablockFromActive(int index) {
+    // _activeData.datablock.children.remove(datablock);
+    // Probably more performant than the above
+    _activeData.datablock.children.removeAt(index);
+
+    if (_activeData.isRoot) {
+      _activePersonBox.deleteAt(index);
+    } else {
+      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+    }
+  }
+
+  void updateDatablockFromActive(Datablock datablock, int index) {
+    _activeData.datablock.children[index] = datablock;
+
+    if (_activeData.isRoot) {
+      _activePersonBox.putAt(index, datablock);
     } else {
       _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
     }
@@ -172,53 +192,22 @@ class PersonBloc extends ChangeNotifier {
     }
   }
 
-  ValueListenable<Box<Datablock>> listenForDatablocks() {
-    return _activePersonBox.listenable();
-  }
+  // ////////////////////////////////////////////////
+  // ////////////////////// Person related code ////
+  // //////////////////////////////////////////////
 
-  void removeDatablockFromActive(Datablock datablock, int index) {
-    // _activeData.datablock.children.remove(datablock);
-    // Probably more performant than the above
-    _activeData.datablock.children.removeAt(index);
-
-    if (_activeData.isRoot) {
-      _activePersonBox.deleteAt(index);
-    } else {
-      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
-    }
-  }
-
-  void updateDatablockFromActive(Datablock datablock, int index) {
-    _activeData.datablock.children[index] = datablock;
-
-    if (_activeData.isRoot) {
-      _activePersonBox.putAt(index, datablock);
-    } else {
-      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
-    }
-  }
-
-  void addDatablockToActivePerson(Datablock datablock) {
-    _activePersonBox.add(datablock);
-  }
-
-  void addPerson(Person person) {
-    Hive.box<Person>("people").add(person);
-  }
+  /// Add a person to the Person box
+  /// Equvilant: `Hive.box<Person>("people").add(person)`
+  void addPerson(Person person) => Hive.box<Person>("people").add(person);
 
   void deletePersonAtIndex(int index) {
     Hive.box<Person>("people").deleteAt(index);
   }
 
-  Datablock datablockOfRoute(List<String> uriSegments) {
-    Datablock active = _activePersonBox.getAt(int.parse(uriSegments[1]));
-
-    int i = 3;
-    for (; i < uriSegments.length; i += 2) {
-      active = active.children[int.parse(uriSegments[i])];
-    }
-
-    return active;
+  /// Equvilant: `_activePersonBox.add(datablock)`
+  @Deprecated("Old, don't want to break code")
+  void addDatablockToActivePerson(Datablock datablock) {
+    _activePersonBox.add(datablock);
   }
 
   static PersonBloc of(BuildContext context, {listen: false}) {

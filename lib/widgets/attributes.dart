@@ -113,7 +113,7 @@ class Attribute extends StatelessWidget {
                               ? RaisedButton(
                                   color: Color(datablock.colourValue),
                                   onPressed: () {
-                                    PersonBloc.of(context).removeDatablockFromActive(datablock, index);
+                                    PersonBloc.of(context).removeDatablockFromActive(index);
                                     Navigator.of(context, rootNavigator: true).pop('dialog');
 
                                     onChange();
