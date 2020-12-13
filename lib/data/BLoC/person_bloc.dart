@@ -38,6 +38,7 @@ class ActiveData {
 }
 
 // It's a change notifier because while it's loading data
+// This tracks the active person, and the active datablock
 class PersonBloc extends ChangeNotifier {
   // This is the active person, basically the person that will be shown on the person screen
   Person _activePerson;
@@ -49,7 +50,7 @@ class PersonBloc extends ChangeNotifier {
   ActiveData _activeData = ActiveData();
 
   // This is path from the rootNode to the current _activeData.data
-  List<int> _path = List<int>();
+  List<int> _path = [];
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
@@ -199,6 +200,10 @@ class PersonBloc extends ChangeNotifier {
 
   void addPerson(Person person) {
     Hive.box<Person>("people").add(person);
+  }
+
+  void deletePersonAtIndex(int index) {
+    Hive.box<Person>("people").deleteAt(index);
   }
 
   Datablock datablockOfRoute(List<String> uriSegments) {

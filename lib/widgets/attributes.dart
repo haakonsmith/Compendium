@@ -2,7 +2,6 @@ import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/datablock.dart';
 import 'package:flutter/material.dart';
 import 'package:compendium/widgets/color_form_field.dart';
-import 'package:hive/hive.dart';
 
 /// # Attribute
 ///

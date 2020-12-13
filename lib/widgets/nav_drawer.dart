@@ -1,6 +1,5 @@
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class NavDrawer extends StatelessWidget {
   NavDrawer();
@@ -16,13 +15,17 @@ class NavDrawer extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
         borderRadius: CompendiumThemeData.of(context).borderRadius,
-        color: CompendiumThemeData.of(context).materialTheme.scaffoldBackgroundColor,
+        color: CompendiumThemeData.of(context)
+            .materialTheme
+            .scaffoldBackgroundColor,
       ),
       child: Drawer(
         elevation: 0,
         child: Container(
           decoration: BoxDecoration(
-            color: CompendiumThemeData.of(context).materialTheme.scaffoldBackgroundColor,
+            color: CompendiumThemeData.of(context)
+                .materialTheme
+                .scaffoldBackgroundColor,
           ),
           child: CompendiumThemeData.of(context).listTileTheme(
             child: Column(

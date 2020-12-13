@@ -19,7 +19,6 @@ class DatablockScreen extends StatefulWidget {
 }
 
 class _DatablockScreenState extends State<DatablockScreen> {
-  bool _loading = true;
   Datablock datablock;
 
   @override

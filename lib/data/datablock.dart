@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +7,6 @@ import 'package:hive/hive.dart';
 
 part 'datablock.g.dart';
 
-// each datablock will have it's own box with a title of datablockID
 @HiveType(typeId: 2)
 class Datablock {
   @HiveField(0)
@@ -54,14 +52,13 @@ class Datablock {
     return newDatablock;
   }
 
-  bool operator ==(o) =>
-      o is Datablock && name == o.name && colourValue == o.colourValue;
-
   static Datablock blank() {
     return Datablock("", "");
   }
 
-  Widget buildPreview(BuildContext context, int datablockId) {
+  /// LOL completely broken. Needs to be revisited
+  /// TODO fix
+  Widget buildPreview(BuildContext context, int datablockIndex) {
     // TODO fix, This is the MOST DISASTROUSLY ugly thing ever, and I'm fully aware, but also. Goodnight.
     return Card(
       elevation: 15,
@@ -74,7 +71,7 @@ class Datablock {
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
           onTap: () =>
-              Navigator.of(context).pushNamed("/datablock/$datablockId"),
+              Navigator.of(context).pushNamed("/datablock/$datablockIndex"),
           child: Container(
             decoration: BoxDecoration(
               border: Border(
@@ -123,9 +120,8 @@ class Datablock {
                                 ),
                                 color: Theme.of(context).primaryColor,
                                 onPressed: () {
-                                  PersonBloc.of(context)
-                                      .activePersonBox
-                                      .deleteAt(datablockId);
+                                  // PersonBloc.of(context)
+                                  //     .deleteDatablockAtIndex(datablockIndex);
                                   Navigator.of(context, rootNavigator: true)
                                       .pop('dialog');
                                 },

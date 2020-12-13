@@ -1,5 +1,4 @@
 import 'package:compendium/data/BLoC/person_bloc.dart';
-import 'package:compendium/data/datablock.dart';
 import 'package:compendium/data/person.dart';
 import 'package:compendium/widgets/nav_drawer.dart';
 import 'package:compendium/widgets/pill_appbar.dart';
@@ -84,21 +83,7 @@ class _IndexScreenState extends State<IndexScreen> {
                             ),
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
-                              if (Hive.isBoxOpen(person.databoxID)) {
-                                Hive.box<Datablock>(person.databoxID)
-                                    .deleteFromDisk();
-                                Hive.box<Person>('people').deleteAt(index);
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                              } else {
-                                Hive.openBox<Datablock>(person.databoxID)
-                                    .then((databox) {
-                                  databox.deleteFromDisk();
-                                  Hive.box<Person>('people').deleteAt(index);
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
-                                });
-                              }
+                              PersonBloc.of(context).deletePersonAtIndex(index);
                             },
                           ),
                         ],
