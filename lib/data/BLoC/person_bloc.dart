@@ -80,7 +80,8 @@ class PersonBloc extends ChangeNotifier {
 
   /// Quality of life improvement over setActivePerson
   Future<void> setActivePersonFromIndex(int personIndex, {Color color}) async {
-    setActivePerson(Hive.box<Person>("people").getAt(personIndex), color: color);
+    setActivePerson(Hive.box<Person>("people").getAt(personIndex),
+        color: color);
   }
 
   bool get loading => _updating;
