@@ -29,6 +29,7 @@ class TemplateBloc extends ChangeNotifier {
     assert(templatesJson is List);
 
     List<Datablock> templates = [defaultTemplate];
+    print(templatesJson);
     templates.addAll(templatesJson.map((d) => Datablock.fromJson(d)).toList().cast<Datablock>());
 
     print(templates.map((e) => e.toJson()));

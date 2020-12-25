@@ -5,6 +5,8 @@ import 'package:compendium/widgets/template_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:compendium/widgets/color_form_field.dart';
 
+import 'datablock_preview.dart';
+
 /// # Attribute
 ///
 /// This is a single attribute of a datablock.
@@ -47,147 +49,12 @@ class Attribute extends StatelessWidget {
 
   /// Creates a dialog where the user can edit the attribute name and value
   void editData(BuildContext context, {@required bool creation}) {
-    int selectedTemplateIndex = 0;
-
     var parentDatablock = PersonBloc.of(context).activeDatablock;
-
-    TextEditingController attributeController = TextEditingController();
-    TextEditingController valueController = TextEditingController();
-    Color colorController = datablock.color ?? parentDatablock.color;
-
-    if (name != null) attributeController.text = name;
-    if (value != null) valueController.text = value;
 
     // if we don't have a datablock, leave
     if (datablock == null) return;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-            builder: (context, setState) => AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                  content: Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(bottom: 20),
-                          child: TextField(
-                            cursorColor: parentDatablock.color,
-                            controller: attributeController,
-                            decoration: InputDecoration(
-                              labelText: "Attribute Name",
-                              border: OutlineInputBorder(),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: parentDatablock.color),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (!datablock.isCatagory)
-                          Container(
-                            margin: EdgeInsets.only(bottom: 20),
-                            child: TextField(
-                              cursorColor: Color(datablock.colorValue),
-                              controller: valueController,
-                              decoration: InputDecoration(
-                                labelText: "Attribute Value",
-                                border: OutlineInputBorder(),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: parentDatablock.color),
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (datablock.isCatagory)
-                          Container(
-                            padding: EdgeInsets.all(8.0),
-                            child: ColorFormField(
-                              onChanged: (color) => colorController = color,
-                              initialColor: colorController,
-                            ),
-                          ),
-                        if (creation)
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              child: TemplateFormField(
-                                onChange: (val) => setState(() {
-                                  selectedTemplateIndex = val;
-                                  datablock = TemplateBloc.of(context).templates[selectedTemplateIndex].copy();
-                                }),
-                              )),
-                        Container(
-                          margin: EdgeInsets.only(top: 20),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment: !creation ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
-                                children: [
-                                  // if it doesn't exist, don't show delete
-                                  !creation
-                                      ? RaisedButton(
-                                          color: Color(datablock.colorValue),
-                                          onPressed: () {
-                                            PersonBloc.of(context).removeDatablockFromActive(index);
-                                            Navigator.of(context, rootNavigator: true).pop('dialog');
-
-                                            onChange();
-                                          },
-                                          child: Text(
-                                            "Delete",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        )
-                                      : Container(),
-
-                                  RaisedButton(
-                                    color: Color(datablock.colorValue),
-                                    onPressed: () {
-                                      datablock.name = attributeController.text;
-                                      if (!datablock.isCatagory) datablock.value = valueController.text;
-                                      datablock.colorValue = colorController.value;
-
-                                      print(index);
-                                      print(datablock);
-
-                                      if (creation) {
-                                        PersonBloc.of(context).addDatablockToActive(datablock);
-                                        selectedTemplateIndex = 0;
-                                      } else {
-                                        PersonBloc.of(context).updateDatablockFromActive(datablock, index);
-                                      }
-
-                                      Navigator.of(context, rootNavigator: true).pop('dialog');
-
-                                      onChange();
-                                    },
-                                    child: Text(
-                                      "Save",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              RaisedButton(
-                                color: Color(datablock.colorValue),
-                                onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
-                                child: Text(
-                                  !creation ? "Cancel" : "Discard",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ));
-      },
-    );
+    showDialog(context: context, builder: (BuildContext context) => AttributeDialog(datablock, index, parentDatablock, editing: !creation, onChange: onChange));
   }
 
   @override
@@ -196,47 +63,212 @@ class Attribute extends StatelessWidget {
       onTap: datablock.isCatagory ? onTap : null,
       child: Card(
         elevation: 0,
-        child: Container(
-          height: 50,
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 10, right: 15),
-                child: icon == null ? Container() : icon,
-              ),
-              Expanded(
+        child: datablock.isCatagory
+            ? DatablockPreview(datablock)
+            : Container(
+                height: 50,
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      name == null ? "" : name,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    Container(
+                      padding: EdgeInsets.only(left: 10, right: 15),
+                      child: (icon == null) ? Container() : icon,
                     ),
-                    Text(
-                      ":",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            name == null ? "" : name,
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            ":",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Text(
+                            value == null ? "" : value,
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          )
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      width: 20,
+                    Container(
+                      padding: EdgeInsets.only(left: 15, right: 10),
+                      child: IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () => editData(context, creation: false),
+                      ),
                     ),
-                    Text(
-                      value == null ? "" : value,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    )
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 15, right: 10),
-                child: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => editData(context, creation: false),
-                ),
-              ),
+      ),
+    );
+  }
+}
+
+class AttributeDialog extends StatefulWidget {
+  AttributeDialog(this.datablock, this.index, this.parentDatablock, {this.editing = false, this.onChange});
+
+  final bool editing;
+  final void Function() onChange;
+
+  @required
+  final Datablock datablock;
+
+  @required
+  final Datablock parentDatablock;
+
+  @required
+  final int index;
+
+  @override
+  _AttributeDialogState createState() => _AttributeDialogState(datablock);
+}
+
+class _AttributeDialogState extends State<AttributeDialog> {
+  Datablock datablock;
+
+  @override
+  _AttributeDialogState(this.datablock);
+
+  @override
+  Widget build(BuildContext context) {
+    int selectedTemplateIndex = 0;
+
+    TextEditingController attributeController = TextEditingController();
+    TextEditingController valueController = TextEditingController();
+    Color colorController = datablock.color ?? widget.parentDatablock.color;
+
+    var dismissButton = RaisedButton(
+      color: Color(datablock.colorValue),
+      onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+      child: Text(
+        widget.editing ? "Cancel" : "Discard",
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+
+    var deleteButton = RaisedButton(
+        color: Color(datablock.colorValue),
+        onPressed: () {
+          PersonBloc.of(context).removeDatablockFromActive(widget.index);
+          Navigator.of(context, rootNavigator: true).pop('dialog');
+
+          widget.onChange();
+        });
+
+    var saveButton = RaisedButton(
+      color: datablock.color,
+      onPressed: () {
+        datablock.name = attributeController.text;
+        if (!datablock.isCatagory) datablock.value = valueController.text;
+        datablock.colorValue = colorController.value;
+
+        if (!widget.editing) {
+          PersonBloc.of(context).addDatablockToActive(datablock);
+          selectedTemplateIndex = 0;
+        } else {
+          PersonBloc.of(context).updateDatablockFromActive(datablock, widget.index);
+        }
+
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+
+        widget.onChange();
+      },
+      child: Text(
+        "Save",
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+
+    var buttonPanel = Container(
+      margin: EdgeInsets.only(top: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: widget.editing ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
+            children: [
+              // if it doesn't exist, don't show delete
+              if (widget.editing) deleteButton,
+
+              saveButton,
             ],
           ),
+          SizedBox(height: 20),
+          dismissButton,
+        ],
+      ),
+    );
+
+    var nameComponent = Container(
+      margin: EdgeInsets.only(bottom: 20),
+      child: TextFormField(
+        cursorColor: widget.parentDatablock.color,
+        controller: attributeController,
+        initialValue: "Attribute Value",
+        // decoration: InputDecoration(
+        //   labelText: "Attribute Name",
+        //   border: OutlineInputBorder(),
+        //   focusedBorder: OutlineInputBorder(
+        //     borderSide: BorderSide(color: widget.parentDatablock.color),
+        //   ),
+        // ),
+      ),
+    );
+
+    var valueComponent = Container(
+      margin: EdgeInsets.only(bottom: 20),
+      child: TextField(
+        cursorColor: Color(datablock.colorValue),
+        controller: valueController,
+        decoration: InputDecoration(
+          labelText: "Attribute Value",
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: widget.parentDatablock.color),
+          ),
+        ),
+      ),
+    );
+
+    var colorComponent = Container(
+      padding: EdgeInsets.all(8.0),
+      child: ColorFormField(
+        onChanged: (color) => colorController = color,
+        initialColor: colorController,
+      ),
+    );
+
+    var templateComponent = Container(
+        alignment: Alignment.centerLeft,
+        child: TemplateFormField(
+          onChange: (val) => setState(() {
+            selectedTemplateIndex = val;
+            print(TemplateBloc.of(context).templates[selectedTemplateIndex].toJson());
+            datablock = TemplateBloc.of(context).templates[selectedTemplateIndex].copy();
+            // attributeController.value = TextEditingValue(text: datablock.name);
+          }),
+        ));
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      content: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            nameComponent,
+            if (!datablock.isCatagory) valueComponent,
+            if (datablock.isCatagory) colorComponent,
+            if (!widget.editing) templateComponent,
+            buttonPanel,
+          ],
         ),
       ),
     );

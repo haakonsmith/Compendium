@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:compendium/theme.dart';
@@ -27,17 +28,22 @@ class Datablock {
   @HiveField(3)
   String value;
 
-  // TODO update to use proper parser
-  bool get isCatagory => ((value.length > 0) ? value[0] : "s") == "c";
+  /// This stores all the metadata about the datablock for things like formatting, etc.
+  @HiveField(4)
+  Map<String, dynamic> metadata = {};
 
-  Datablock(this.name, this.value, {this.colorValue = defaultColorValue, children})
+  bool get isCatagory => (metadata['category'] ?? "false") == "true";
+  set isCatagory(bool val) => metadata['category'] = val.toString();
+
+  Datablock(this.name, this.value, {this.colorValue = defaultColorValue, List<Datablock> children, Map<String, dynamic> metadata})
       // https://stackoverflow.com/questions/54279223/flutter-default-assignment-of-list-parameter-in-a-constructor
       // Otherwise null errors appear
-      : children = children ?? <Datablock>[];
+      : children = children ?? [],
+        metadata = metadata ?? Map<String, dynamic>();
 
   String toString() => "name: " + name + " colorValue: " + Color(colorValue).toString() + " value: " + value + " children?: " + (children == null).toString();
 
-  Map toJson() => {"name": name, "value": value, "colorValue": colorValue, "children": children.map((c) => c.toJson()).toList()};
+  Map toJson() => {"name": name, "value": value, "colorValue": colorValue, "children": children.map((c) => c.toJson()).toList(), "metadata": metadata};
 
   /// Constructs a datablock from json, recursively
   ///
@@ -48,7 +54,8 @@ class Datablock {
   ///    'value': String,
   ///    'colorValue': int,
   ///    'color': Color,
-  ///    'children': List<Datablock>
+  ///    'children': List<Datablock>,
+  ///    'metadata': Map<String, String>
   /// }
   /// ```
   ///
@@ -69,11 +76,12 @@ class Datablock {
       //Creates an instance of PlaceName and adds to the placeNames list.
       children.add(Datablock.fromJson(list));
     });
+    metadata = json['metadata'];
   }
 
   /// Performs a deep copy of the object
   Datablock copy() {
-    var newDatablock = Datablock(name, value, colorValue: colorValue);
+    var newDatablock = Datablock(name, value, colorValue: colorValue, metadata: metadata);
     newDatablock.children = children.map((c) => c.copy()).toList();
     return newDatablock;
   }
@@ -82,7 +90,8 @@ class Datablock {
       : name = "",
         value = "",
         colorValue = defaultColorValue,
-        children = <Datablock>[];
+        children = <Datablock>[],
+        metadata = {};
 
   /// LOL completely broken. Needs to be revisited
   /// TODO fix

@@ -1,6 +1,16 @@
 [
     {
         "name": "test",
-        "value": "c"
+        "value": "",
+        "metadata": {
+            "category": "true"
+        }
+    },
+    {
+        "name": "Event Log",
+        "value": "",
+        "metadata": {
+            "category": "true"
+        }
     }
 ]

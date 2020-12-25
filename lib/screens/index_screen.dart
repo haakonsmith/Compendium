@@ -81,6 +81,7 @@ class _IndexScreenState extends State<IndexScreen> {
                             color: Theme.of(context).primaryColor,
                             onPressed: () {
                               PersonBloc.of(context).deletePersonAtIndex(index);
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
                             },
                           ),
                         ],

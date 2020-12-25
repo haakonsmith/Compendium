@@ -30,6 +30,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   ListView _listViewBuilder(List<Datablock> templates) {
+    templateBloc.reInit();
     return ListView.builder(
       itemCount: templates.length,
       itemBuilder: (context, index) {
