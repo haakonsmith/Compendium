@@ -3,6 +3,7 @@ import 'package:compendium/data/datablock.dart';
 import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/theme.dart';
 import 'package:compendium/widgets/attributes.dart';
+import 'package:compendium/widgets/contextual_floating_action_button.dart';
 import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +39,9 @@ class _DatablockScreenState extends State<DatablockScreen> {
       body: Container(
         child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock.children),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: ContextualFloatingActionButton(
         backgroundColor: Color(datablock.colorValue),
-        child: Icon(Icons.add),
+        children: [Icon(Icons.add), Icon(Icons.add)],
         // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
         // so I'm just doing this to avoid copy-pasting the dialog code here too
         onPressed: () => Attribute.fromDialog(

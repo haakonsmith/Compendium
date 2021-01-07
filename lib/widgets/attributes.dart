@@ -141,7 +141,7 @@ class _AttributeDialogState extends State<AttributeDialog> {
   Widget build(BuildContext context) {
     int selectedTemplateIndex = 0;
 
-    TextEditingController attributeController = TextEditingController();
+    TextEditingController attributeController = TextEditingController(text: datablock.name);
     TextEditingController valueController = TextEditingController();
     Color colorController = datablock.color ?? widget.parentDatablock.color;
 
@@ -212,14 +212,14 @@ class _AttributeDialogState extends State<AttributeDialog> {
       child: TextFormField(
         cursorColor: widget.parentDatablock.color,
         controller: attributeController,
-        initialValue: "Attribute Value",
-        // decoration: InputDecoration(
-        //   labelText: "Attribute Name",
-        //   border: OutlineInputBorder(),
-        //   focusedBorder: OutlineInputBorder(
-        //     borderSide: BorderSide(color: widget.parentDatablock.color),
-        //   ),
-        // ),
+        // initialValue: "Attribute Value",
+        decoration: InputDecoration(
+          labelText: "Attribute Name",
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: widget.parentDatablock.color),
+          ),
+        ),
       ),
     );
 
