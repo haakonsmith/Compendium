@@ -43,7 +43,7 @@ class CompendiumThemeData extends ChangeNotifier {
 
   final Color colorPrimary = Color(blueBlackPrimaryValue);
 
-  final BorderRadius borderRadius = BorderRadius.circular(20);
+  final BorderRadius borderRadius = BorderRadius.circular(15);
 
   Widget get dataLoadingIndicator => Center(
           child: CircularProgressIndicator(
@@ -58,6 +58,7 @@ class CompendiumThemeData extends ChangeNotifier {
 
   final lightTheme = ThemeData(
     primarySwatch: primaryBlueBlack,
+    scaffoldBackgroundColor: Colors.grey.shade50,
     textTheme: Typography.blackCupertino,
     cardTheme: CardTheme(
       shape: RoundedRectangleBorder(

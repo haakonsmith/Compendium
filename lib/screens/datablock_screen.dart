@@ -39,15 +39,21 @@ class _DatablockScreenState extends State<DatablockScreen> {
       body: Container(
         child: PersonBloc.of(context).loading ? CompendiumThemeData.of(context).dataLoadingIndicator : _buildListView(context, datablock.children),
       ),
-      floatingActionButton: ContextualFloatingActionButton(
+      floatingActionButton: ContextualFloatingActionBar(
         backgroundColor: Color(datablock.colorValue),
-        children: [Icon(Icons.add), Icon(Icons.add)],
-        // this is kinda unnecessary because as soon as setState is called it will make a new Attribute
-        // so I'm just doing this to avoid copy-pasting the dialog code here too
-        onPressed: () => Attribute.fromDialog(
-          context,
-          onChange: () => setState(() {}),
-        ),
+        children: [
+          ContextualFloatingActionButton(
+              icon: Icon(Icons.add),
+              onPressed: () => Attribute.fromDialog(
+                    context,
+                    onChange: () => setState(() {}),
+                  )),
+          if (datablock.metadata.suggestedChild != null)
+            ContextualFloatingActionButton(
+              icon: Icon(Icons.add_chart),
+              onPressed: () => PersonBloc.of(context).addDatablockToActive(datablock.metadata.suggestedChild),
+            )
+        ],
       ),
     );
   }
@@ -57,7 +63,6 @@ class _DatablockScreenState extends State<DatablockScreen> {
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
           var attribute = Attribute(
-            onChange: () => setState(() => {}),
             onTap: () {
               PersonBloc.of(context).nestFurther(index);
               Navigator.of(context).push(NestedPageRoute(builder: (context) => DatablockScreen()));

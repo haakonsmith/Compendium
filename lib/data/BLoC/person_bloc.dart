@@ -1,6 +1,7 @@
 import 'package:compendium/data/datablock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../person.dart';
@@ -20,9 +21,7 @@ class ActiveData {
 
   // This is important... But I forgot why
   // I think it's the rootNode index
-  int rootNodeIndex = 0;
-
-  int indexInParentNode = 0;
+  // int rootNodeIndex = 0;
 
   // If it's a root node we don't need to do the nesting stuff
   // see references
@@ -66,6 +65,8 @@ class PersonBloc extends ChangeNotifier {
         await Hive.box<Datablock>(_activePerson.databoxID).close();
       }
     }
+
+    print(await getApplicationSupportDirectory());
 
     _activePerson = person;
     _activeColor = color;
@@ -126,21 +127,24 @@ class PersonBloc extends ChangeNotifier {
     if (_activeData.isRoot) {
       _activePersonBox.add(datablock);
     } else {
-      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+      _activePersonBox.putAt(_path.first, _activeData.rootNode);
     }
+
+    notifyListeners();
   }
 
   /// Remove a datablock from the currently activeDatablock based on index
   void removeDatablockFromActive(int index) {
-    // _activeData.datablock.children.remove(datablock);
-    // Probably more performant than the above
     _activeData.datablock.children.removeAt(index);
 
     if (_activeData.isRoot) {
       _activePersonBox.deleteAt(index);
+      print("here");
     } else {
-      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+      _activePersonBox.putAt(_path.first, _activeData.rootNode);
     }
+
+    notifyListeners();
   }
 
   void updateDatablockFromActive(Datablock datablock, int index) {
@@ -149,15 +153,16 @@ class PersonBloc extends ChangeNotifier {
     if (_activeData.isRoot) {
       _activePersonBox.putAt(index, datablock);
     } else {
-      _activePersonBox.putAt(_activeData.rootNodeIndex, _activeData.rootNode);
+      _activePersonBox.putAt(_path.first, _activeData.rootNode);
     }
+
+    // notifyListeners();
   }
 
   void nestFurther(int index) {
-    _activeData.indexInParentNode = index;
-
+    print(_path);
     if (_activeData.isRoot) {
-      _activeData.rootNodeIndex = index;
+      // _activeData.rootNodeIndex = index;
       // If it is root? We need to change to current root...
       _activeData.rootNode = _activeData.datablock.children[index];
       logger.i("setting rootNode");
@@ -168,24 +173,29 @@ class PersonBloc extends ChangeNotifier {
     _path.add(index);
 
     _activeData.traverseDown(index);
+
+    notifyListeners();
   }
 
   void popNesting() {
-    if (_path.length != 0) {
-      var finalIndex = _path.removeLast();
+    print(_path);
+    if (_path.isNotEmpty) {
+      _path.removeLast();
 
       _activeData.datablock = rootDatablock;
+      _activeData.isRoot = true;
+
+      print(_activeData.datablock.toString());
 
       // Traverse the path to get the futhest most item
       _path.forEach((index) {
         _activeData.traverseDown(index);
       });
-
-      _activeData.isRoot = false;
-      _activeData.indexInParentNode = finalIndex;
-    } else {
-      _activeData.isRoot = true;
     }
+
+    _activeData.isRoot = (_path.length <= 1);
+
+    notifyListeners();
   }
 
   // ////////////////////////////////////////////////

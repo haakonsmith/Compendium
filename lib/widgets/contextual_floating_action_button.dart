@@ -3,8 +3,15 @@ import 'package:flutter/material.dart';
 /// This widget is like the floating action button and provides extra functionality.
 /// Such as expanding to show contextual interface elements.
 /// As well as animations.
-class ContextualFloatingActionButton extends StatelessWidget {
-  ContextualFloatingActionButton({this.onPressed, this.backgroundColor, children, this.shape, this.elevation, this.focusElevation, this.hoverElevation})
+class ContextualFloatingActionBar extends StatelessWidget {
+  ContextualFloatingActionBar(
+      {this.onPressed,
+      this.backgroundColor,
+      children,
+      this.shape,
+      this.elevation,
+      this.focusElevation,
+      this.hoverElevation})
       : assert(elevation == null || elevation >= 0.0),
         assert(focusElevation == null || focusElevation >= 0.0),
         assert(hoverElevation == null || hoverElevation >= 0.0),
@@ -28,9 +35,15 @@ class ContextualFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var floatingActionButtonTheme = Theme.of(context).floatingActionButtonTheme;
-    final double elevation = this.elevation ?? floatingActionButtonTheme.elevation ?? _defaultElevation;
-    final double focusElevation = this.focusElevation ?? floatingActionButtonTheme.focusElevation ?? _defaultFocusElevation;
-    final double hoverElevation = this.hoverElevation ?? floatingActionButtonTheme.hoverElevation ?? _defaultHoverElevation;
+    final double elevation = this.elevation ??
+        floatingActionButtonTheme.elevation ??
+        _defaultElevation;
+    final double focusElevation = this.focusElevation ??
+        floatingActionButtonTheme.focusElevation ??
+        _defaultFocusElevation;
+    final double hoverElevation = this.hoverElevation ??
+        floatingActionButtonTheme.hoverElevation ??
+        _defaultHoverElevation;
     ShapeBorder shape;
 
     if (children.length == 1) shape = _defaultShape;
@@ -51,18 +64,36 @@ class ContextualFloatingActionButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: children
                   .map((child) => Expanded(
-                          child: RawMaterialButton(
-                        onPressed: () => print('test'),
-                        shape: _defaultShape,
-                        child: IconTheme(data: IconTheme.of(context), child: child),
-                        elevation: 0,
-                        hoverElevation: 0,
-                        fillColor: backgroundColor,
-                        constraints: BoxConstraints.tight(Size(buttonSize, buttonSize)),
-                      )))
+                        child: IconTheme(
+                            data: IconTheme.of(context), child: child),
+                      ))
                   .toList(),
             )));
 
     return MergeSemantics(child: result);
+  }
+}
+
+class ContextualFloatingActionButton extends StatelessWidget {
+  ContextualFloatingActionButton(
+      {this.label, this.icon, this.onPressed, this.constraints, this.style});
+
+  final Widget label;
+  final Widget icon;
+  final VoidCallback onPressed;
+  ButtonStyle style;
+  final BoxConstraints constraints;
+
+  static const ShapeBorder _defaultShape = CircleBorder();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      color: Colors.white,
+      icon: icon,
+      constraints: constraints,
+      onPressed: onPressed,
+      splashRadius: 28,
+    );
   }
 }

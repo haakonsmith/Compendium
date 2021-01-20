@@ -3,14 +3,59 @@
         "name": "test",
         "value": "",
         "metadata": {
-            "category": "true"
+            "category": true
         }
     },
     {
         "name": "Event Log",
         "value": "",
         "metadata": {
-            "category": "true"
+            "category": true,
+            "display_style": "stacked",
+            "suggested_child": {
+                "name": "Event Log Event",
+                "value": "",
+                "children": [
+                    {
+                        "name": "Significance",
+                        "value": "",
+                        "metadata": {
+                            "category": false,
+                            "value_style": "bar"
+                        }
+                    },
+                    {
+                        "name": "Event Description",
+                        "value": "",
+                        "metadata": {
+                            "category": false,
+                            "value_style": "textarea"
+                        }
+                    }
+                ],
+                "metadata": {
+                    "category": true,
+                    "display_style": "flat"
+                }
+            }
+        }
+    },
+    {
+        "name": "Event Log Event",
+        "value": "",
+        "children": [
+            {
+                "name": "Significance",
+                "value": "",
+                "metadata": {
+                    "category": false,
+                    "value_style": "bar"
+                }
+            }
+        ],
+        "metadata": {
+            "category": true,
+            "display_style": "flat"
         }
     }
 ]

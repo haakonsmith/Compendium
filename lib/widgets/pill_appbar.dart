@@ -15,6 +15,29 @@ Widget kBackBtn = Icon(
   // color: Colors.black54,
 );
 
+class _BackButton extends StatelessWidget {
+  const _BackButton({Key key, this.onPressed}) : super(key: key);
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    assert(debugCheckHasMaterialLocalizations(context));
+    return IconButton(
+      icon: const BackButtonIcon(),
+      splashRadius: 23,
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      onPressed: () {
+        if (onPressed != null) {
+          onPressed();
+        } else {
+          Navigator.maybePop(context);
+        }
+      },
+    );
+  }
+}
+
 // Generates a pill appbar contextually
 class PillAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget title;
@@ -65,13 +88,14 @@ class _PillAppBarState extends State<PillAppBar> {
     if (leading == null && widget.automaticallyImplyLeading) {
       if (Scaffold.of(context).hasDrawer) {
         leading = IconButton(
+          splashRadius: 20,
           icon: Icon(Icons.menu),
           onPressed: Scaffold.of(context).openDrawer,
           tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
         );
       } else {
         if (canPop)
-          leading = BackButton(
+          leading = _BackButton(
             onPressed: widget.onBackButtonPressed,
           );
       }

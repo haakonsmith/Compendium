@@ -59,56 +59,7 @@ class Attribute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: datablock.isCatagory ? onTap : null,
-      child: Card(
-        elevation: 0,
-        child: datablock.isCatagory
-            ? DatablockPreview(datablock)
-            : Container(
-                height: 50,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 15),
-                      child: (icon == null) ? Container() : icon,
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            name == null ? "" : name,
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            ":",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            value == null ? "" : value,
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 15, right: 10),
-                      child: IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => editData(context, creation: false),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
-    );
+    return DatablockPreview(datablock, index, onTap: onTap, onEdit: () => editData(context, creation: false));
   }
 }
 
@@ -142,7 +93,7 @@ class _AttributeDialogState extends State<AttributeDialog> {
     int selectedTemplateIndex = 0;
 
     TextEditingController attributeController = TextEditingController(text: datablock.name);
-    TextEditingController valueController = TextEditingController();
+    TextEditingController valueController = TextEditingController(text: datablock.value);
     Color colorController = datablock.color ?? widget.parentDatablock.color;
 
     var dismissButton = RaisedButton(
@@ -156,6 +107,7 @@ class _AttributeDialogState extends State<AttributeDialog> {
 
     var deleteButton = RaisedButton(
         color: Color(datablock.colorValue),
+        child: Text("delete", style: TextStyle(color: Colors.white)),
         onPressed: () {
           PersonBloc.of(context).removeDatablockFromActive(widget.index);
           Navigator.of(context, rootNavigator: true).pop('dialog');
@@ -167,7 +119,7 @@ class _AttributeDialogState extends State<AttributeDialog> {
       color: datablock.color,
       onPressed: () {
         datablock.name = attributeController.text;
-        if (!datablock.isCatagory) datablock.value = valueController.text;
+        if (!datablock.isCategory) datablock.value = valueController.text;
         datablock.colorValue = colorController.value;
 
         if (!widget.editing) {
@@ -253,6 +205,8 @@ class _AttributeDialogState extends State<AttributeDialog> {
             selectedTemplateIndex = val;
             print(TemplateBloc.of(context).templates[selectedTemplateIndex].toJson());
             datablock = TemplateBloc.of(context).templates[selectedTemplateIndex].copy();
+
+            print(datablock.metadata.toJson());
             // attributeController.value = TextEditingValue(text: datablock.name);
           }),
         ));
@@ -264,8 +218,8 @@ class _AttributeDialogState extends State<AttributeDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             nameComponent,
-            if (!datablock.isCatagory) valueComponent,
-            if (datablock.isCatagory) colorComponent,
+            if (!datablock.isCategory) valueComponent,
+            if (datablock.isCategory) colorComponent,
             if (!widget.editing) templateComponent,
             buttonPanel,
           ],
