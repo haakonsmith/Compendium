@@ -1,10 +1,12 @@
 import 'package:compendium/data/datablock.dart';
+import 'package:compendium/data/json_data_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../person.dart';
+import 'package:pretty_json/pretty_json.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -67,6 +69,7 @@ class PersonBloc extends ChangeNotifier {
     }
 
     print(await getApplicationSupportDirectory());
+    print(await JsonDataInterface.jsonifyDatabase());
 
     _activePerson = person;
     _activeColor = color;

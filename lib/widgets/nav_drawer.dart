@@ -1,4 +1,5 @@
 import 'package:compendium/data/BLoC/template_bloc.dart';
+import 'package:compendium/data/json_data_interface.dart';
 import 'package:compendium/routers/instant_page_route.dart';
 import 'package:compendium/screens/template_screen.dart';
 import 'package:compendium/theme.dart';
@@ -11,6 +12,42 @@ class NavDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var listView = Column(
+      children: <Widget>[
+        ListTile(
+          leading: Icon(Icons.supervisor_account_rounded),
+          title: Text('People Index'),
+          onTap: () =>
+              // Clear the navigation stack so back button doesn't do stuff
+              navigateTo(context, "/index"),
+        ),
+        ListTile(
+          leading: Icon(Icons.settings_applications_rounded),
+          title: Text('Settings'),
+          // Clear the navigation stack so back button doesn't do stuff
+          onTap: () => navigateTo(context, "/settings"),
+        ),
+        ListTile(
+          leading: Icon(Icons.developer_board_rounded),
+          title: Text('DEBUG: reload templates'),
+          // Clear the navigation stack so back button doesn't do stuff
+          onTap: () => navigateTo(context, TemplateScreen.routeName),
+        ),
+        Expanded(
+          child: Align(
+            alignment: FractionalOffset.bottomCenter,
+            child: ListTile(
+              leading: Icon(Icons.save_alt_rounded),
+              title: Text('Export database as Json'),
+
+              // Clear the navigation stack so back button doesn't do stuff
+              onTap: () => JsonDataInterface.exportDatabase(),
+            ),
+          ),
+        ),
+      ],
+    );
+
     return Container(
         padding: EdgeInsets.all(28.0),
         height: MediaQuery.of(context).size.height * 0.9,
@@ -28,29 +65,7 @@ class NavDrawer extends StatelessWidget {
               // color: CompendiumThemeData.of(context).materialTheme.scaffoldBackgroundColor,
               color: Colors.transparent,
               child: CompendiumThemeData.of(context).listTileTheme(
-                child: ListView(
-                  children: <Widget>[
-                    ListTile(
-                      leading: Icon(Icons.supervisor_account_rounded),
-                      title: Text('People Index'),
-                      onTap: () =>
-                          // Clear the navigation stack so back button doesn't do stuff
-                          navigateTo(context, "/index"),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.settings_applications_rounded),
-                      title: Text('Settings'),
-                      // Clear the navigation stack so back button doesn't do stuff
-                      onTap: () => navigateTo(context, "/settings"),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.developer_board_rounded),
-                      title: Text('DEBUG: reload templates'),
-                      // Clear the navigation stack so back button doesn't do stuff
-                      onTap: () => navigateTo(context, TemplateScreen.routeName),
-                    ),
-                  ],
-                ),
+                child: listView,
               ),
             ),
           ),

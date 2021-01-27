@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   hive: 
+  file_picker_cross: ^4.2.7
   hive_flutter: 
   path_provider:
   provider: ^4.3.2+2
@@ -40,6 +41,7 @@ dev_dependencies:
   build_runner: 
   logger: 
   logger_flutter:
+  pretty_json:
   
 
 

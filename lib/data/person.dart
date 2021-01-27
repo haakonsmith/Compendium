@@ -23,7 +23,7 @@ class Person {
     @required this.databoxID,
   });
 
-  static Person blank() {
+  factory Person.blank() {
     return Person(firstName: "", lastName: "", databoxID: "");
   }
 
@@ -31,4 +31,6 @@ class Person {
   String toString() {
     return "$firstName $lastName";
   }
+
+  Map toJson() => {'firstName': firstName, 'lastName': lastName, 'databoxID': databoxID};
 }
