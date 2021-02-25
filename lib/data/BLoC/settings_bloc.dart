@@ -9,6 +9,7 @@ class SettingsBloc extends ChangeNotifier {
   };
 
   Box _settingsBox;
+  Box get settingsBox => Hive.isBoxOpen('settings') ? _settingsBox : _init();
 
   bool _loading = true;
   bool get loading => _loading;
@@ -47,12 +48,12 @@ class SettingsBloc extends ChangeNotifier {
     }
 
     // In the future there may be more than a light or dark theme, but for now we'll convert a string to a bool.
-    return _settingsBox.get("theme") == "light" ? false : true;
+    return settingsBox.get("theme") == "light" ? false : true;
   }
 
   set darkTheme(bool value) {
     // In the future there may be more than a light or dark theme, but for now we'll convert a bool to a string.
-    _settingsBox.put("theme", value ? "dark" : "light");
+    settingsBox.put("theme", value ? "dark" : "light");
     notifyListeners();
   }
 }

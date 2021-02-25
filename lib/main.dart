@@ -40,8 +40,6 @@ void main() async {
   Hive.registerAdapter(DatablockValueStyleAdapter());
   Hive.registerAdapter(DatablockMetadataAdapter());
 
-  await Hive.openBox<Person>(HiveBoxes.personBox);
-
   runApp(
     MultiProvider(
       providers: [

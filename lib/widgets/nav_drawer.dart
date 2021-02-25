@@ -1,3 +1,4 @@
+import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/BLoC/template_bloc.dart';
 import 'package:compendium/data/json_data_interface.dart';
 import 'package:compendium/routers/instant_page_route.dart';
@@ -33,17 +34,26 @@ class NavDrawer extends StatelessWidget {
           // Clear the navigation stack so back button doesn't do stuff
           onTap: () => navigateTo(context, TemplateScreen.routeName),
         ),
-        Expanded(
-          child: Align(
-            alignment: FractionalOffset.bottomCenter,
-            child: ListTile(
-              leading: Icon(Icons.save_alt_rounded),
-              title: Text('Export database as Json'),
+        // Push everything below it to the bottom of the drawer
+        Expanded(child: Container()),
+        ListTile(
+          leading: Icon(Icons.save_alt_rounded),
+          title: Text('Export database as Json'),
 
-              // Clear the navigation stack so back button doesn't do stuff
-              onTap: () => JsonDataInterface.exportDatabase(),
-            ),
-          ),
+          // Clear the navigation stack so back button doesn't do stuff
+          onTap: () => JsonDataInterface.exportDatabase(),
+        ),
+        ListTile(
+          leading: Icon(Icons.import_contacts),
+          title: Text('Import Json database'),
+
+          // Clear the navigation stack so back button doesn't do stuff
+          onTap: () {
+            JsonDataInterface.importDatabase();
+            
+            PersonBloc.of(context).loading = true;
+            PersonBloc.of(context).loadPersonBox();
+          },
         ),
       ],
     );

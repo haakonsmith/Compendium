@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../person.dart';
-import 'package:pretty_json/pretty_json.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,10 +15,17 @@ var logger = Logger(
   printer: PrettyPrinter(),
 );
 
-/// This is just a neat dataclass to wrap all the attributes in
-class ActiveData {
+class DatablockTree {
   /// active datablock
-  Datablock datablock;
+  Datablock datablockContext;
+
+  Datablock _rootData;
+
+  bool _isEmpty = true;
+
+  DatablockTree(this._rootData) : this._isEmpty = false;
+
+  DatablockTree.empty();
 
   // This is important... But I forgot why
   // I think it's the rootNode index
@@ -27,14 +33,53 @@ class ActiveData {
 
   // If it's a root node we don't need to do the nesting stuff
   // see references
-  bool isRoot = true;
+  bool _isRoot = true;
+  bool get isRoot => _isRoot;
+
+  // This is path from the rootNode to the current _datablockTree.data
+  List<int> path = [];
 
   /// Track the active rootnode
   Datablock rootNode;
 
   /// Updates the active data with children.elementAt(index) data
   void traverseDown(int index) {
-    datablock = datablock.children[index];
+    if (_isEmpty) throw StateError('Datablock Tree does not contain data');
+
+    if (_isRoot) {
+      // _datablockTree.rootNodeIndex = index;
+      // If it is root? We need to change to current root...
+      rootNode = datablockContext.children[index];
+
+      // If we nest past root, it won't be root
+      _isRoot = false;
+    }
+
+    path.add(index);
+
+    // Finally update context
+    datablockContext = datablockContext.children[index];
+  }
+
+  /// update the context to be the parent datablock.
+  void traverseUp() {
+    if (_isEmpty) throw StateError('Datablock Tree does not contain data');
+
+    if (path.isNotEmpty) {
+      path.removeLast();
+
+      datablockContext = _rootData;
+      _isRoot = true;
+
+      print(datablockContext.toString());
+
+      // Traverse the path to get the futhest most item
+      path.forEach((index) {
+        traverseDown(index);
+      });
+    }
+
+    _isRoot = (path.length <= 1);
   }
 }
 
@@ -47,17 +92,28 @@ class PersonBloc extends ChangeNotifier {
   /// Because a person is not a datablock it doesn't store a color
   Color _activeColor;
 
-  Box<Datablock> _activePersonBox;
-  ActiveData _activeData = ActiveData();
+  Box<Person> _personBox;
 
-  // This is path from the rootNode to the current _activeData.data
-  List<int> _path = [];
+  Box<Person> get personBox => Hive.isBoxOpen('people') ? _personBox : loadPersonBox();
+  Box<Datablock> _activePersonBox;
+  DatablockTree _datablockTree = DatablockTree.empty();
 
   // This will be true if it's changing from _activePerson = null or _activePerson = a different person
   bool _updating = true;
 
   /// Constructs a datablock from the databox
   Datablock get rootDatablock => Datablock(_activePerson.firstName + " " + _activePerson.lastName, "", colorValue: _activeColor.value, children: _activePersonBox.values.toList());
+
+  PersonBloc() {
+    loadPersonBox();
+  }
+
+  Future<void> loadPersonBox() async {
+    _personBox = await Hive.openBox<Person>('people');
+    _updating = false;
+
+    notifyListeners();
+  }
 
   // Create the box or open it
   Future<void> setActivePerson(Person person, {Color color}) async {
@@ -75,8 +131,7 @@ class PersonBloc extends ChangeNotifier {
     _activeColor = color;
     _activePersonBox = await Hive.openBox<Datablock>(_activePerson.databoxID);
 
-    _activeData.isRoot = true;
-    _activeData.datablock = rootDatablock;
+    _datablockTree = DatablockTree(rootDatablock);
 
     _updating = false;
     notifyListeners();
@@ -87,6 +142,7 @@ class PersonBloc extends ChangeNotifier {
     setActivePerson(Hive.box<Person>("people").getAt(personIndex), color: color);
   }
 
+  set loading(bool v) => _updating = v;
   bool get loading => _updating;
 
   Person get activePerson {
@@ -98,7 +154,7 @@ class PersonBloc extends ChangeNotifier {
   Datablock get activeDatablock {
     if (_updating) return null;
 
-    return _activeData.datablock;
+    return _datablockTree.datablockContext;
   }
 
   Box<Datablock> get activePersonBox {
@@ -107,30 +163,15 @@ class PersonBloc extends ChangeNotifier {
     return _activePersonBox;
   }
 
-  ValueListenable<Box<Datablock>> listenToDatablocks() {
-    return _activePersonBox.listenable();
-  }
-
-  /// Get parent based on path
-  @Deprecated("This shouldn't be used. May be useful for reference")
-  Datablock getParentFromActive(List<int> path) {
-    var rootData = _activePersonBox.getAt(_path.first);
-    Datablock parent = rootData;
-
-    for (var i = 0; i < path.length; i++) {
-      parent = parent.children[path[i]];
-    }
-
-    return parent;
-  }
+  ValueListenable<Box<Datablock>> listenToDatablocks() => _activePersonBox.listenable();
 
   void addDatablockToActive(Datablock datablock) {
-    _activeData.datablock.children.add(datablock);
+    _datablockTree.datablockContext.children.add(datablock);
 
-    if (_activeData.isRoot) {
+    if (_datablockTree.isRoot) {
       _activePersonBox.add(datablock);
     } else {
-      _activePersonBox.putAt(_path.first, _activeData.rootNode);
+      _activePersonBox.putAt(_datablockTree.path.first, _datablockTree.rootNode);
     }
 
     notifyListeners();
@@ -138,66 +179,37 @@ class PersonBloc extends ChangeNotifier {
 
   /// Remove a datablock from the currently activeDatablock based on index
   void removeDatablockFromActive(int index) {
-    _activeData.datablock.children.removeAt(index);
+    _datablockTree.datablockContext.children.removeAt(index);
 
-    if (_activeData.isRoot) {
+    if (_datablockTree.isRoot) {
       _activePersonBox.deleteAt(index);
       print("here");
     } else {
-      _activePersonBox.putAt(_path.first, _activeData.rootNode);
+      _activePersonBox.putAt(_datablockTree.path.first, _datablockTree.rootNode);
     }
 
     notifyListeners();
   }
 
   void updateDatablockFromActive(Datablock datablock, int index) {
-    _activeData.datablock.children[index] = datablock;
+    _datablockTree.datablockContext.children[index] = datablock;
 
-    if (_activeData.isRoot) {
+    if (_datablockTree.isRoot) {
       _activePersonBox.putAt(index, datablock);
     } else {
-      _activePersonBox.putAt(_path.first, _activeData.rootNode);
+      _activePersonBox.putAt(_datablockTree.path.first, _datablockTree.rootNode);
     }
 
     // notifyListeners();
   }
 
   void nestFurther(int index) {
-    print(_path);
-    if (_activeData.isRoot) {
-      // _activeData.rootNodeIndex = index;
-      // If it is root? We need to change to current root...
-      _activeData.rootNode = _activeData.datablock.children[index];
-      logger.i("setting rootNode");
-      // If we nest past root, it won't be root
-      _activeData.isRoot = false;
-    }
-
-    _path.add(index);
-
-    _activeData.traverseDown(index);
-
+    _datablockTree.traverseDown(index);
     notifyListeners();
   }
 
   void popNesting() {
-    print(_path);
-    if (_path.isNotEmpty) {
-      _path.removeLast();
-
-      _activeData.datablock = rootDatablock;
-      _activeData.isRoot = true;
-
-      print(_activeData.datablock.toString());
-
-      // Traverse the path to get the futhest most item
-      _path.forEach((index) {
-        _activeData.traverseDown(index);
-      });
-    }
-
-    _activeData.isRoot = (_path.length <= 1);
-
+    _datablockTree.traverseUp();
     notifyListeners();
   }
 
@@ -212,12 +224,6 @@ class PersonBloc extends ChangeNotifier {
   void deletePersonAtIndex(int index) {
     Hive.box<Person>("people").deleteAt(index);
     Hive.deleteBoxFromDisk(_activePerson.databoxID);
-  }
-
-  /// Equvilant: `_activePersonBox.add(datablock)`
-  @Deprecated("Old, don't want to break code")
-  void addDatablockToActivePerson(Datablock datablock) {
-    _activePersonBox.add(datablock);
   }
 
   static PersonBloc of(BuildContext context, {listen: false}) {

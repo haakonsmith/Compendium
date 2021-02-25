@@ -33,4 +33,8 @@ class Person {
   }
 
   Map toJson() => {'firstName': firstName, 'lastName': lastName, 'databoxID': databoxID};
+  Person.fromJson(Map<String, dynamic> json)
+      : firstName = json['firstName'],
+        lastName = json['lastName'],
+        databoxID = json['databoxID'];
 }

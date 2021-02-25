@@ -17,8 +17,23 @@ class _IndexScreenState extends State<IndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    box = Hive.box('people');
     personBloc = PersonBloc.of(context, listen: true);
+
+    if (personBloc.loading)
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: PillAppBar(title: Text("People Index")),
+        drawer: NavDrawer(),
+        body: Center(child: Text('Loading...')),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => getNewPerson(context).then((value) => personBloc.addPerson(value)),
+          child: Icon(Icons.add),
+        ),
+      );
+
+    box = personBloc.personBox;
+
+    print(box.values);
 
     return Scaffold(
       extendBodyBehindAppBar: true,

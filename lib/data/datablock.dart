@@ -135,7 +135,8 @@ class DatablockMetadata {
 
   static DatablockDisplayStyle datablockDisplayStyleFromString(String string) {
     print(string);
-    return DatablockDisplayStyle.values.firstWhere((e) => e.toString().replaceFirst("DatablockDisplayStyle.", "") == string);
+    print(DatablockDisplayStyle.values.map((e) => e.toString().replaceFirst("DatablockDisplayStyle.", "")));
+    return DatablockDisplayStyle.values.firstWhere((e) => e.toString().replaceFirst("DatablockDisplayStyle.", "") == string.replaceFirst("DatablockDisplayStyle.", ""));
   }
 
   static DatablockValueStyle datablockValueStyleFromString(String string) => DatablockValueStyle.values.firstWhere((e) => e.toString().replaceFirst("DatablockValueStyle.", "") == string);

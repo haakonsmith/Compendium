@@ -173,7 +173,8 @@ class DatablockPreview extends StatelessWidget {
       case DatablockDisplayStyle.stacked:
         final List datablockIndices = Iterable<int>.generate(min(datablock.children.length, 3)).toList();
 
-        final List lightness = [1.0, 0.99, 0.98].toList();
+        final List lightness =
+            Iterable<double>.generate(min(datablock.children.length, 3), (count) => min(max(Theme.of(context).scaffoldBackgroundColor.computeLuminance() - 0.1 * (count - 1), 0), 1)).toList();
 
         print(child);
 

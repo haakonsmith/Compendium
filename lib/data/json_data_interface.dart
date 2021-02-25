@@ -28,7 +28,7 @@ class JsonDataInterface {
     final boxData = box.values.cast<Datablock>();
 
     try {
-      data['data'] = boxData.map((e) => e.toJson());
+      data['"data"'] = boxData.map((e) => json.encode(e)).toList();
     } catch (e) {
       return Future.error(e);
     }
@@ -46,11 +46,12 @@ class JsonDataInterface {
     final peopleData = personBox.values;
 
     // Create and populate the people part of the json
-    data['people'] = peopleData.map((e) => e.toJson());
+    data['"people"'] = peopleData.map((e) => json.encode(e)).toList();
 
     for (var person in peopleData) {
       Box box = await Hive.openBox<Datablock>(person.databoxID);
-      data[person.databoxID] = await _jsonifyHiveBox(box);
+      final id = person.databoxID;
+      data['"$id"'] = await _jsonifyHiveBox(box);
     }
 
     print(data.runtimeType);
@@ -74,7 +75,58 @@ class JsonDataInterface {
     }
   }
 
-  static void exportDatabase() async {
+  static Future<void> exportDatabase() async {
     await writeJsonData();
+  }
+
+  /// This nukes the entire database and everything
+  static Future<void> _clearDatabase() async {
+    Box<Person> personBox = await Hive.openBox<Person>(HiveBoxes.personBox);
+
+    for (final person in personBox.values) {
+      Box box = await Hive.openBox<Datablock>(person.databoxID);
+
+      await box.clear();
+    }
+
+    await personBox.clear();
+  }
+
+  /// This function creates a 'import back up' and nukes the in ram data base
+  static Future<void> importDatabase() async {
+    final rawData = await readJsonData();
+
+    _clearDatabase();
+
+    // Import personbox
+    await Hive.close();
+    Box<Person> personBox = await Hive.openBox<Person>(HiveBoxes.personBox);
+
+    var people = (rawData['people'] as List).map((e) => Person.fromJson(e));
+    personBox.addAll(people);
+
+    print(personBox.values);
+
+    for (final person in people) {
+      Box box = await Hive.openBox<Datablock>(person.databoxID);
+
+      final datablocks = (rawData[person.databoxID]['data'] as List).map((e) => Datablock.fromJson(e));
+
+      box.addAll(datablocks);
+    }
+  }
+
+  static Future<Map<String, dynamic>> readJsonData() async {
+    String data;
+
+    if (Platform.isMacOS) {
+      final picker = await FilePickerCross.importFromStorage();
+      data = picker.toString();
+    } else {
+      final file = await _localFile;
+      data = await file.readAsString();
+    }
+
+    return Future.value(json.decode(data) as Map<String, dynamic>);
   }
 }
