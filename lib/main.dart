@@ -2,7 +2,6 @@ import 'package:compendium/data/BLoC/person_bloc.dart';
 import 'package:compendium/data/BLoC/settings_bloc.dart';
 import 'package:compendium/data/BLoC/template_bloc.dart';
 import 'package:compendium/data/datablock.dart';
-import 'package:compendium/data/hive_boxes.dart';
 import 'package:compendium/routers/instant_page_route.dart';
 import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/screens/datablock_screen.dart';
@@ -10,9 +9,7 @@ import 'package:compendium/screens/index_screen.dart';
 import 'package:compendium/screens/settings_screen.dart';
 import 'package:compendium/screens/template_screen.dart';
 import 'package:compendium/theme.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 import 'package:hive/hive.dart';

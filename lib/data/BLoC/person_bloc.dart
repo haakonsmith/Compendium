@@ -23,13 +23,11 @@ class DatablockTree {
 
   bool _isEmpty = true;
 
-  DatablockTree(this._rootData) : this._isEmpty = false;
+  DatablockTree(this._rootData)
+      : this._isEmpty = false,
+        datablockContext = _rootData;
 
   DatablockTree.empty();
-
-  // This is important... But I forgot why
-  // I think it's the rootNode index
-  // int rootNodeIndex = 0;
 
   // If it's a root node we don't need to do the nesting stuff
   // see references
@@ -58,7 +56,24 @@ class DatablockTree {
     path.add(index);
 
     // Finally update context
+    // This is here because otherwise there is an fixed list error
+    var children = List<Datablock>.from(datablockContext.children[index].children);
+
     datablockContext = datablockContext.children[index];
+    datablockContext.children = children;
+
+    print(datablockContext);
+  }
+
+  bool hasFixLength(List list) {
+    try {
+      list
+        ..add(null)
+        ..removeLast();
+      return false;
+    } on UnsupportedError {
+      return true;
+    }
   }
 
   /// update the context to be the parent datablock.
@@ -70,8 +85,6 @@ class DatablockTree {
 
       datablockContext = _rootData;
       _isRoot = true;
-
-      print(datablockContext.toString());
 
       // Traverse the path to get the futhest most item
       path.forEach((index) {
@@ -183,7 +196,6 @@ class PersonBloc extends ChangeNotifier {
 
     if (_datablockTree.isRoot) {
       _activePersonBox.deleteAt(index);
-      print("here");
     } else {
       _activePersonBox.putAt(_datablockTree.path.first, _datablockTree.rootNode);
     }

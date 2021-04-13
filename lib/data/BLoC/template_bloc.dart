@@ -17,7 +17,6 @@ class TemplateBloc extends ChangeNotifier {
   static Datablock defaultTemplate = Datablock("None", "");
 
   Box _templatesBox;
-  List<Datablock> _templateCache;
 
   bool _loading = true;
   bool get loading => _loading;

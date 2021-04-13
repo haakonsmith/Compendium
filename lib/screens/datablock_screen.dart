@@ -4,6 +4,7 @@ import 'package:compendium/routers/nested_page_route.dart';
 import 'package:compendium/theme.dart';
 import 'package:compendium/widgets/attributes.dart';
 import 'package:compendium/widgets/contextual_floating_action_button.dart';
+import 'package:compendium/widgets/multicolumn_listview.dart';
 import 'package:compendium/widgets/pill_appbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class _DatablockScreenState extends State<DatablockScreen> {
   }
 
   Widget _buildListView(BuildContext context, List<Datablock> datablocks) {
-    return ListView.builder(
+    return MultiColumnListView.builder(
         itemCount: datablocks.length,
         itemBuilder: (context, index) {
           var attribute = Attribute(

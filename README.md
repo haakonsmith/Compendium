@@ -6,7 +6,7 @@ This project was built by programmers for programmers, so it's been designed to 
 
 ## Flutter version
 
-Currently this project uses the beta branch of flutter: `Flutter 1.23.0 • channel dev`. This is because ideally this project will have mobile, and desktop support. **This is subject to change**
+Currently this project uses the dev branch of flutter: `Flutter 2.0 • channel dev`. You can use the stable branch but in development we wanted to get the most up to date desktop support.
 
 ## Packages
 
